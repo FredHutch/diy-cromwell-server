@@ -91,6 +91,8 @@ Workflow options can be applied to any workflow to tune how the individual insta
 - `write_to_cache`: Do you want to write metadata about this workflow to the database to allow for future use of the cached files it might create?
 - `read_from_cache`: Do you want to query the database to determine if portions of this workflow have already completed successfully, thus they do not need to be re-computed.  
 
+## R support
+I have a basic R package that wraps the Cromwell API allowing you to submit, monitior and kill workflow jobs on `gizmo` from R directly.  This means once you set up your server, you don't have to interact with the command line to do workflow submissions again.  The package is [fh.wdlR](https://github.com/FredHutch/fh.wdlR).  
 
 ## Workflow Publishing
 If you are ok with sharing your workflow for use by others in our community or you would like to get some help making your workflow work, please put your workflow into a GitHub repo in the Fred Hutch organization, with one workflow per repo, the above file structure for workflow, inputs and batch, and a quick README.md explaining what the workflow does, what inputs are needed, what assumptions are made. 
