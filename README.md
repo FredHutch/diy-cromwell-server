@@ -40,7 +40,8 @@ Once this is complete, you can file a ticket to `scicomp` to request the databas
 2.  Tailor your `cromwellParams.sh` file to be specific to your particular server (see suggestions in the file and below).
 3.  Put your DB information (`DB Username`, `DB Password` and `Port`) into the fields marked in `fh-slurm-cromwell.config`.  
 4.  Adjust, if desired, the resources requested for your server in `cromServer.sh`.  
->>Note:  For this server, you will want multiple cores to allow it to multi-task.  Memory is less important when you use an external database.  I have requested one `largenode` for this server but you can request less if you are likely to be only doing one workflow at a time.  
+
+> Note:  For this server, you will want multiple cores to allow it to multi-task.  Memory is less important when you use an external database.  I have requested one `largenode` for this server but you can request less if you are likely to be only doing one workflow at a time.  
 
 5.  Kick off your server by connecting to `rhino`, going to your `cromwell` folder and using:
 ```
@@ -49,7 +50,8 @@ sbatch -o \
     cromServer.sh \
     /home/cromwell/cromwellParams.sh
 ```
-> Note:  the second line here will save the output of the actual sbatch'd server job to `/fh/fast/pilastname_f/cromwell/cromwell-serverlogs/` with the file name being <jobID>.txt.  This is not required but is helpful initially for you to troubleshoot if your server goes down and you don't know why.  
+
+> Note:  the second line here will save the output of the actual sbatch'd server job to `/fh/fast/pilastname_f/cromwell/cromwell-serverlogs/` with the file name being `jobID`.txt.  This is not required but is helpful initially for you to troubleshoot if your server goes down and you don't know why.  
 
 6. For using the API (either via a browser or via the R package): On `rhino` type: `squeue -u username` to find the list of jobs you have running.  Note the node name (such as `gizmoj30`) that your server job was assigned to.  When you go your browser, you can go to `http://gizmoj30:2020` (or whatever the webservice port you chose in your config file was) to use the Swagger UI to submit workflows.  Or when using the R package, you can set the environment variable `CROMWELLURL` to be `http://gizmoj30:2020` and then the job submission and monitoring commands will know where to send requests.  
 
@@ -69,7 +71,8 @@ In order to improve sharability and also leverage the R package, as well as futu
   - in csv or tsv, a batch-specific list of the raw input data sets intended to be processed using the same set of inputs/parameters for the same workflow, WITH HEADERS!!
   - This file is a list of data locations and any other sample/job-specific information the workflow needs.  Ideally this would be relatively minimal so that the consistency of the analysis between input data sets are as similar as possible to leverage the strengths of a reproducible workflow.  
 4.  Workflow options (OPTIONAL): [Example here](workflow-options.json)
- - Example:
+Example:
+ 
 ```
   {
     "workflow_failure_mode": "NoNewCalls",
@@ -80,11 +83,13 @@ In order to improve sharability and also leverage the R package, as well as futu
     "read_from_cache": true
 }
 ```
-    Workflow options can be applied to any workflow to tune how the individual instance of the workflow should behave. There are more options than these that can be found in the Cromwell docs site, but of most interest are the following parameters:
-    - `workflow_failure_mode`: `NoNewCalls` indicates that if one task fails, no new calls will be sent and all existing calls will be allowed to finish.  `ContinueWhilePossible` indicates that even if one task fails, all other task series should be continued until all possible jobs are completed either successfully or not.
-    - `default_runtime_attributes.maxRetries`: The maximum number of times a job can be retried if it fails in a way that is considered a retryable failure (like if a job gets dumped or the server goes down).
-    - `write_to_cache`: Do you want to write metadata about this workflow to the database to allow for future use of the cached files it might create?
-    - `read_from_cache`: Do you want to query the database to determine if portions of this workflow have already completed successfully, thus they do not need to be re-computed.  
+
+Workflow options can be applied to any workflow to tune how the individual instance of the workflow should behave. There are more options than these that can be found in the Cromwell docs site, but of most interest are the following parameters:
+
+- `workflow_failure_mode`: `NoNewCalls` indicates that if one task fails, no new calls will be sent and all existing calls will be allowed to finish.  `ContinueWhilePossible` indicates that even if one task fails, all other task series should be continued until all possible jobs are completed either successfully or not.
+- `default_runtime_attributes.maxRetries`: The maximum number of times a job can be retried if it fails in a way that is considered a retryable failure (like if a job gets dumped or the server goes down).
+- `write_to_cache`: Do you want to write metadata about this workflow to the database to allow for future use of the cached files it might create?
+- `read_from_cache`: Do you want to query the database to determine if portions of this workflow have already completed successfully, thus they do not need to be re-computed.  
 
 
 ## Workflow Publishing
