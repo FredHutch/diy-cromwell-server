@@ -43,17 +43,32 @@ Once this is complete, you can file a ticket to `scicomp` to request the databas
 
 > Note:  For this server, you will want multiple cores to allow it to multi-task.  Memory is less important when you use an external database.  I have requested one `largenode` for this server but you can request less if you are likely to be only doing one workflow at a time.  
 
-5.  Kick off your server by connecting to `rhino`, going to your `cromwell` folder and using:
+5.  Kick off your server either:
+
+By connecting to `rhino` then:
 ```
 sbatch -o \
-    /fh/fast/pilastname_f/cromwell/cromwell-serverlogs/%A.txt \
-    cromServer.sh \
-    /home/cromwell/cromwellParams.sh
+    /home/username/cromwell/cromwell-serverlogs/%A.txt \
+    /home/username/cromwell/cromServer.sh \
+    /home/username/cromwell/cromwellParams.sh
 ```
 
-> Note:  the second line here will save the output of the actual sbatch'd server job to `/fh/fast/pilastname_f/cromwell/cromwell-serverlogs/` with the file name being `jobID`.txt.  This is not required but is helpful initially for you to troubleshoot if your server goes down and you don't know why.  
+> Note:  the second line here will save the output of the actual sbatch'd server job to `/home/username/cromwell/cromwell-serverlogs/` with the file name being `jobID`.txt.  This is not required but is helpful initially for you to troubleshoot if your server goes down and you don't know why.  
 
-6. For using the API (either via a browser or via the R package): On `rhino` type: `squeue -u username` to find the list of jobs you have running.  Note the node name (such as `gizmoj30`) that your server job was assigned to.  When you go your browser, you can go to `http://gizmoj30:2020` (or whatever the webservice port you chose in your config file was) to use the Swagger UI to submit workflows.  Or when using the R package, you can set the environment variable `CROMWELLURL` to be `http://gizmoj30:2020` and then the job submission and monitoring commands will know where to send requests.  
+Or from your local R instance using the [fh.wdlR R package](https://github.com/FredHutch/fh.wdlR):
+
+```{r}
+library(fh.wdlR)
+cromwellCreate(FredHutchId = "username", port = "2020",
+        pathToServerLogs = "/home/username/cromwell/cromwell-serverlogs/%A.txt",
+        pathToScript = "/home/username/cromwell/cromServer.sh",
+        pathToParams = "/home/username/cromwell/cromwellParams.sh")
+```
+
+If you use the R package, when you use the `cromwellCreate` function it will return the necessary information for using the API via a browser AND will automatically set your `CROMWELLURL` environment variable to the correct location for the remaining job submission and management functions in the R package.  Then you can skip step 6 and do not have to ever connect to `rhino` unless you want to.  
+
+
+6. For using the API (via a browser, some other method of submission): On `rhino` type: `squeue -u username` to find the list of jobs you have running.  Note the node name (such as `gizmoj30`) that your server job was assigned to.  When you go your browser, you can go to `http://gizmoj30:2020` (or whatever the webservice port you chose in your config file was) to use the Swagger UI to submit workflows.  
 
 > Note:  To test your server, you can send the `hello-gizmo` workflow that is in this repo, in the folder `helloHostname`.  
 
@@ -72,7 +87,7 @@ In order to improve sharability and also leverage the R package, as well as futu
   - This file is a list of data locations and any other sample/job-specific information the workflow needs.  Ideally this would be relatively minimal so that the consistency of the analysis between input data sets are as similar as possible to leverage the strengths of a reproducible workflow.  
 4.  Workflow options (OPTIONAL): [Example here](workflow-options.json)
 Example:
- 
+
 ```
   {
     "workflow_failure_mode": "NoNewCalls",
@@ -92,10 +107,10 @@ Workflow options can be applied to any workflow to tune how the individual insta
 - `read_from_cache`: Do you want to query the database to determine if portions of this workflow have already completed successfully, thus they do not need to be re-computed.  
 
 ## R support
-I have a basic R package that wraps the Cromwell API allowing you to submit, monitior and kill workflow jobs on `gizmo` from R directly.  This means once you set up your server, you don't have to interact with the command line to do workflow submissions again.  The package is [fh.wdlR](https://github.com/FredHutch/fh.wdlR).  
+I have a basic R package that wraps the Cromwell API allowing you to submit, monitor and kill workflow jobs on `gizmo` from R directly. It also has a function (`cromwellCreate`) that can help you set up your Cromwell server directly from R assuming your configuration files are saved where `rhino` can reach them and you know their paths. This means that you don't necessarily have to interact with the command line to do workflow submissions again.  The package is [fh.wdlR](https://github.com/FredHutch/fh.wdlR).  
 
 ## Workflow Publishing
-If you are ok with sharing your workflow for use by others in our community or you would like to get some help making your workflow work, please put your workflow into a GitHub repo in the Fred Hutch organization, with one workflow per repo, the above file structure for workflow, inputs and batch, and a quick README.md explaining what the workflow does, what inputs are needed, what assumptions are made. 
+If you are ok with sharing your workflow for use by others in our community or you would like to get some help making your workflow work, please put your workflow into a GitHub repo in the Fred Hutch organization, with one workflow per repo, the above file structure for workflow, inputs and batch, and a quick README.md explaining what the workflow does, what inputs are needed, what assumptions are made.
 > Note:  In the title of the GitHub repo, please include `-wdl` (or `-cwl`) so that others can more easily find your repo.
 
 ## Other Fred Hutch based resources
