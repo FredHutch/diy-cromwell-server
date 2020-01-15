@@ -12,7 +12,7 @@ WORKFLOWOUTPUTSDIR=/fh/fast/pilastname_f/cromwell/cromwell-outputs
 
 ## Where do you want individual task-level logs to be written after a workflow is successful?
 ### Suggestion: /fh/fast/pilastname_f/cromwell/cromwell-outputs
-WORKFLOWCALLLOGSDIR=/fh/fast/pilastname_f/trgen/Cromwell/cromwell-outputs
+WORKFLOWCALLLOGSDIR=/fh/fast/pilastname_f/cromwell/cromwell-outputs
 
 ## Where is your configuration file?
 ### Suggestion: /home/username/fh-slurm-cromwell.config

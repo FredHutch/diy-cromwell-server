@@ -58,11 +58,15 @@ sbatch -o \
 Or from your local R instance using the [fh.wdlR R package](https://github.com/FredHutch/fh.wdlR):
 
 ```{r}
+require(remotes)
+remotes::install_github('FredHutch/fh.wdlR')
 library(fh.wdlR)
 cromwellCreate(FredHutchId = "username", port = "2020",
         pathToServerLogs = "/home/username/cromwell/cromwell-serverlogs/%A.txt",
         pathToScript = "/home/username/cromwell/cromServer.sh",
         pathToParams = "/home/username/cromwell/cromwellParams.sh")
+# You can use this to confirm that the environment variable was set correctly:
+Sys.getenv("CROMWELLURL")
 ```
 
 If you use the R package, when you use the `cromwellCreate` function it will return the necessary information for using the API via a browser AND will automatically set your `CROMWELLURL` environment variable to the correct location for the remaining job submission and management functions in the R package.  Then you can skip step 6 and do not have to ever connect to `rhino` unless you want to.  
