@@ -1,5 +1,5 @@
 ## This is a test workflow that returns the hostname of the node the job is submitted to as a test for the Gizmo backend. 
-workflow hello_gizmo {
+workflow hello_hostname {
 call hostname {
 }
   output {
@@ -10,7 +10,7 @@ call hostname {
 ## Task Descriptions
 task hostname {
   command {
-    echo hostname
+    echo $(hostname)
   }
   runtime {
   }

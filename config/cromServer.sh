@@ -9,6 +9,7 @@ module purge
 
 # Read in your custom config parameters
 source ${1}
+# ${2} is the port you want to open on the node you get for the API
 
 # Load the Cromwell Module you'd like
 module load cromwell/47-Java-1.8
@@ -23,6 +24,7 @@ java -Xms4g \
     -Dworkflow-options.final_workflow_log_dir=${WORKFLOWLOGDIR} \
     -Dworkflow-options.final_workflow_outputs_dir=${WORKFLOWOUTPUTSDIR} \
     -Dworkflow-options.final_call_logs_dir=${WORKFLOWCALLOGSDIR} \
+    -Dwebservice.port=${2} \
     -jar $EBROOTCROMWELL/cromwell-47.jar \
     server
 

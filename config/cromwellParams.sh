@@ -15,5 +15,5 @@ WORKFLOWOUTPUTSDIR=/fh/fast/pilastname_f/cromwell/cromwell-outputs
 WORKFLOWCALLLOGSDIR=/fh/fast/pilastname_f/cromwell/cromwell-outputs
 
 ## Where is your configuration file?
-### Suggestion: /home/username/fh-slurm-cromwell.config
-CROMWELLCONFIG=/home/username/fh-slurm-cromwell.config
+### Suggestion: /fh/fast/pilastname_f/cromwell/config
+CROMWELLCONFIG=/fh/fast/pilastname_f/cromwell/config

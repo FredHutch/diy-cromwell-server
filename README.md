@@ -50,10 +50,11 @@ By connecting to `rhino` then:
 sbatch -o \
     /home/username/cromwell/cromwell-serverlogs/%A.txt \
     /home/username/cromwell/cromServer.sh \
-    /home/username/cromwell/cromwellParams.sh
+    /home/username/cromwell/cromwellParams.sh \
+    2020
 ```
 
-> Note:  the second line here will save the output of the actual sbatch'd server job to `/home/username/cromwell/cromwell-serverlogs/` with the file name being `jobID`.txt.  This is not required but is helpful initially for you to troubleshoot if your server goes down and you don't know why.  
+> Note:  the second line here will save the output of the actual sbatch'd server job to `/home/username/cromwell/cromwell-serverlogs/` with the file name being `jobID`.txt.  This is not required but is helpful initially for you to troubleshoot if your server goes down and you don't know why.  The last line here is the port you want to use for the API - change it to whatever you'd like.
 
 Or from your local R instance using the [fh.wdlR R package](https://github.com/FredHutch/fh.wdlR):
 
@@ -62,9 +63,9 @@ require(remotes)
 remotes::install_github('FredHutch/fh.wdlR')
 library(fh.wdlR)
 cromwellCreate(FredHutchId = "username", port = "2020",
-        pathToServerLogs = "/home/username/cromwell/cromwell-serverlogs/%A.txt",
-        pathToScript = "/home/username/cromwell/cromServer.sh",
-        pathToParams = "/home/username/cromwell/cromwellParams.sh")
+        pathToServerLogs = "/some/path/cromwell/cromwell-serverlogs/%A.txt",
+        pathToScript = "/some/path/cromwell/cromServer.sh",
+        pathToParams = "/some/path/cromwell/cromwellParams.sh")
 # You can use this to confirm that the environment variable was set correctly:
 Sys.getenv("CROMWELLURL")
 ```
@@ -72,7 +73,7 @@ Sys.getenv("CROMWELLURL")
 If you use the R package, when you use the `cromwellCreate` function it will return the necessary information for using the API via a browser AND will automatically set your `CROMWELLURL` environment variable to the correct location for the remaining job submission and management functions in the R package.  Then you can skip step 6 and do not have to ever connect to `rhino` unless you want to.  
 
 
-6. For using the API (via a browser, some other method of submission): On `rhino` type: `squeue -u username` to find the list of jobs you have running.  Note the node name (such as `gizmoj30`) that your server job was assigned to.  When you go your browser, you can go to `http://gizmoj30:2020` (or whatever the webservice port you chose in your config file was) to use the Swagger UI to submit workflows.  
+6. For using the API (via a browser, some other method of submission): On `rhino` type: `squeue -u username` to find the list of jobs you have running.  Note the node name (such as `gizmoj30`) that your server job was assigned to.  When you go your browser, you can go to `http://gizmoj30:2020` ("2020" or whatever the webservice port you chose) to use the Swagger UI to submit workflows.  
 
 > Note:  To test your server, you can send the `hello-gizmo` workflow that is in this repo, in the folder `helloHostname`.  
 
