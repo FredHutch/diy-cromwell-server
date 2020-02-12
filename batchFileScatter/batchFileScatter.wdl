@@ -10,7 +10,7 @@ workflow TGR_s3BatchFileScatter {
 call fetchS3Input as fetchBatch {
   input:
     s3Input = s3batchFile,
-    awscliModule = awscliModule
+    modules = awscliModule
 }
 
 # Read the contents of the batch file into an Array of objects to scatter over
@@ -28,13 +28,13 @@ scatter (job in batchInfo){
   call fetchS3Input as fetchBam {
   input:
     s3Input = bamFile,
-    awscliModule = awscliModule
+    modules = awscliModule
   }
 
   call fetchS3Input as fetchBed {
     input:
       s3Input = bedFile,
-      awscliModule = awscliModule
+      modules = awscliModule
   }
 
 ## INSERT YOUR WORKFLOW HERE
@@ -52,13 +52,13 @@ scatter (job in batchInfo){
 task fetchS3Input {
   String s3Input
   String inputBasename = basename(s3Input)
-  String awscliModule
+  String modules
   command {
     set -eo pipefail
-    module load ${awscliModule}
     aws s3 cp ${s3Input} ${inputBasename}
   }
   runtime {
+    modules: "${modules}"
   }
   output {
     File file = "${inputBasename}"
