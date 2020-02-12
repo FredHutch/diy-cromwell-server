@@ -1,6 +1,6 @@
 ## Where do you want the working directory to be for Cromwell?  
 ### Suggestion: /fh/scratch/delete90/pilastname_f/cromwell-executions
-SCRATCHPATH=/fh/scratch/delete90/pilastname_f/crowell-executions
+SCRATCHPATH=/fh/scratch/delete90/pilastname_f/cromwell-executions
 
 ## Where do you want logs about individual workflows (not jobs) to be written?
 ### Suggestion: /fh/fast/pilastname_f/cromwell/workflow-logs
@@ -15,8 +15,8 @@ WORKFLOWOUTPUTSDIR=/fh/fast/pilastname_f/cromwell/outputs
 WORKFLOWCALLLOGSDIR=/fh/fast/pilastname_f/cromwell/outputs
 
 ## Where is your configuration file?
-### Suggestion: /fh/fast/pilastname_f/cromwell/config
-CROMWELLCONFIG=/fh/fast/pilastname_f/cromwell/config
+### Suggestion: /fh/fast/pilastname_f/cromwell/fh-slurm-cromwell.config
+CROMWELLCONFIG=/fh/fast/pilastname_f/cromwell/fh-slurm-cromwell.config
 
 ## DB4Sci MariaDB details:
 CROMWELLDBPORT=<DB PORT>
