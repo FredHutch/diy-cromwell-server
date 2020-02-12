@@ -24,6 +24,9 @@ java -Xms4g \
     -Dworkflow-options.final_workflow_log_dir=${WORKFLOWLOGDIR} \
     -Dworkflow-options.final_workflow_outputs_dir=${WORKFLOWOUTPUTSDIR} \
     -Dworkflow-options.final_call_logs_dir=${WORKFLOWCALLOGSDIR} \
+    -Ddatabase.db.url=jdbc:mysql://mydb:${CROMWELLDBPORT}/${CROMWELLDBNAME}?rewriteBatchedStatements=true \
+    -Ddatabase.db.user=${CROMWELLDBUSERNAME} \
+    -Ddatabase.db.password=${CROMWELLDBPASSWORD} \
     -Dwebservice.port=${2} \
     -jar $EBROOTCROMWELL/cromwell-47.jar \
     server

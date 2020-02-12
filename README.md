@@ -23,23 +23,35 @@ These are more Cromwell/Broad oriented instructions and resources:
 
 
 ## Steps to prepare
-If you have questions about these, feel free to contact Amy Paguirigan (`apaguiri`) or `SciComp`.  
+If you have questions about these steps, feel free to contact Amy Paguirigan (`apaguiri`) or `SciComp`.  
 
 ### Rhino Access
 Currently, to run your own Cromwell server you'll need to know how to connect to `rhino` at the Fred Hutch.  Read over at [SciWiki](https://sciwiki.fredhutch.org/) in the Scientific Computing section about Access Methods, and Technologies.  
 
-### Database
-These instructions let you stand up a Cromwell server with the default maximum wall time on our HPC cluster, which is 3 days.  If you have workflows that run longer than that or you want to be able to get metadata for or restart jobs even after the server goes down, you'll want an external database.  We have found as well that by using a MySQL database for your Cromwell server, it will run faster and be better able to handle simultaneous workflows while also making all the metadata available to you during and after the run.  
+### Database Setup
+These instructions let you stand up a Cromwell server with the default maximum wall time on our HPC cluster, which is 3 days.  If you have workflows that run longer than that or you want to be able to get metadata for or restart jobs even after the server goes down, you'll want an external database.  We have found as well that by using a MySQL database for your Cromwell server, it will run faster than a file based database and be better able to handle simultaneous workflows while also making all the metadata available to you during and after the run.  
 
 We currently suggest you go to [DB4Sci](https://mydb.fredhutch.org/login) and see the Wiki entry for DB4Sci [here](https://sciwiki.fredhutch.org/scicomputing/store_databases/#db4sci--previously-mydb).  There, you will login using Fred Hutch credentials, choose `Create DB Container`, and choose the MariaDB option.  The default database container values are typically fine, but do save the `DB/Container Name`, `DB Username` and `DB Password` as you will need them for the  configuration step.  Once you click submit, a confirmation screen will appear (hopefully), and you'll need to note which `Port` is specified.  This is a 5 digit number.  
 
-Once this is complete, you can file a ticket to `scicomp` to request the database to be set up in that container.  Then you're ready to go!
+Once this is complete, you can file a ticket to `scicomp` to request the database to be set up in that container. Or if you are able to get onto `rhino`, you can do the following.  
+
+```
+mysql -p -u <DB Username> -h mydb -P <Port>
+```
+It will then prompt you to enter the DB password you specified during setup.  Once you are are a "mysql>" prompt, you can do the following.
+>Note, we suggest you name the database inside the container the same as the container, but you cannot include dashes in your database name.  In the future, DB4Sci may also set up the database inside the container for you, in which case you would be provided a database name as well during setup.
+```
+mysql> create database <DB Name>
+# It should do it's magic
+mysql> exit
+```
+
+ Then you're ready to go and never have to set up the database part again and you can use this database to manage all your work over time.  
 
 ## Server setup instructions
 1.  Decide where you want to keep your Cromwell configuration files.  This must be a place where `rhino` can access them, such as in your `Home` directory, which is typically the default directory when you connect to the `rhinos`.  Create a `cromwell` folder (or whatever you want to call it) and save the files in this repo's `config` folder there.  
 2.  Tailor your `cromwellParams.sh` file to be specific to your particular server (see suggestions in the file and below).
-3.  Put your DB information (`DB Username`, `DB Password` and `Port`) into the fields marked in `fh-slurm-cromwell.config`.  
-4.  Adjust, if desired, the resources requested for your server in `cromServer.sh`.  
+3.  Adjust, if desired, the resources requested for your server in `cromServer.sh`.  
 
 > Note:  For this server, you will want multiple cores to allow it to multi-task.  Memory is less important when you use an external database.  I have requested one `largenode` for this server but you can request less if you are likely to be only doing one workflow at a time.  
 
@@ -48,13 +60,13 @@ Once this is complete, you can file a ticket to `scicomp` to request the databas
 By connecting to `rhino` then:
 ```
 sbatch -o \
-    /home/username/cromwell/cromwell-serverlogs/%A.txt \
-    /home/username/cromwell/cromServer.sh \
-    /home/username/cromwell/cromwellParams.sh \
+    /home/cromwell/serverlogs/%A.txt \
+    /home/cromwell/cromServer.sh \
+    /home/cromwell/cromwellParams.sh \
     2020
 ```
 
-> Note:  the second line here will save the output of the actual sbatch'd server job to `/home/username/cromwell/cromwell-serverlogs/` with the file name being `jobID`.txt.  This is not required but is helpful initially for you to troubleshoot if your server goes down and you don't know why.  The last line here is the port you want to use for the API - change it to whatever you'd like.
+> Note:  the second line here will save the output of the actual sbatch'd server job to `/home/cromwell/serverlogs/` with the file name being `jobID`.txt.  This is not required but is helpful initially for you to troubleshoot if your server goes down and you don't know why.  The last line here is the port you want to use for the API - change it to whatever you'd like.
 
 Or from your local R instance using the [fh.wdlR R package](https://github.com/FredHutch/fh.wdlR):
 
@@ -63,7 +75,7 @@ require(remotes)
 remotes::install_github('FredHutch/fh.wdlR')
 library(fh.wdlR)
 cromwellCreate(FredHutchId = "username", port = "2020",
-        pathToServerLogs = "/some/path/cromwell/cromwell-serverlogs/%A.txt",
+        pathToServerLogs = "/some/path/cromwell/serverlogs/%A.txt",
         pathToScript = "/some/path/cromwell/cromServer.sh",
         pathToParams = "/some/path/cromwell/cromwellParams.sh")
 # You can use this to confirm that the environment variable was set correctly:
@@ -116,7 +128,7 @@ I have a basic R package that wraps the Cromwell API allowing you to submit, mon
 
 ## Workflow Publishing
 If you are ok with sharing your workflow for use by others in our community or you would like to get some help making your workflow work, please put your workflow into a GitHub repo in the Fred Hutch organization, with one workflow per repo, the above file structure for workflow, inputs and batch, and a quick README.md explaining what the workflow does, what inputs are needed, what assumptions are made.
-> Note:  In the title of the GitHub repo, please include `-wdl` (or `-cwl`) so that others can more easily find your repo.
+> Note:  In the title of the GitHub repo, please include `-wdl` (or `-cwl`) so that others can more easily find your repo and so it will show up in our Fred Hutch Project listing.
 
 ## Other Fred Hutch based resources
 While additional development is going on to make Cromwell work better in AWS (currently it works well in Google and SLURM among other backends), we are anticipating that it will be more widely available for use with AWS based computing.  To support that there is a growing public data set AWS S3 bucket at `fh-ctr-public-reference-data`.  Contact Amy Paguirigan or Sam Minot if you'd like something to be added here and we can help you do that.  
@@ -131,14 +143,20 @@ In `config/cromwellParams.sh` there are some variables that allow users to share
 SCRATCHPATH=/fh/scratch/delete90/pilastname_f/cromwell-executions
 
 ## Where do you want logs about individual workflows (not jobs) to be written?
-WORKFLOWLOGDIR=/fh/fast/pilastname_f/cromwell/cromwell-workflow-logs
+WORKFLOWLOGDIR=/fh/fast/pilastname_f/cromwell/workflow-logs
 
 ## Where do you want final output files specified by workflows to be copied for your subsequent use?
-WORKFLOWOUTPUTSDIR=/fh/fast/pilastname_f/cromwell/cromwell-outputs
+WORKFLOWOUTPUTSDIR=/fh/fast/pilastname_f/cromwell/outputs
 
 ## Where do you want individual task-level logs to be written after a workflow is successful?
-WORKFLOWCALLLOGSDIR=/fh/fast/pilastname_f/trgen/Cromwell/cromwell-outputs
+WORKFLOWCALLLOGSDIR=/fh/fast/pilastname_f/trgen/Cromwell/outputs
 
 ## Where is your configuration file?
-CROMWELLCONFIG=/home/username/fh-slurm-cromwell.config
+CROMWELLCONFIG=/home/fh-slurm-cromwell.config
+
+## DB4Sci MariaDB details:
+CROMWELLDBPORT=<DB PORT>
+CROMWELLDBNAME=<DB NAME>
+CROMWELLDBUSERNAME=<DB USERNAME>
+CROMWELLDBPASSWORD=<DB PASSWORD>
 ```

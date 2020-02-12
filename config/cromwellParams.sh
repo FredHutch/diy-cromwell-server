@@ -17,3 +17,9 @@ WORKFLOWCALLLOGSDIR=/fh/fast/pilastname_f/cromwell/outputs
 ## Where is your configuration file?
 ### Suggestion: /fh/fast/pilastname_f/cromwell/config
 CROMWELLCONFIG=/fh/fast/pilastname_f/cromwell/config
+
+## DB4Sci MariaDB details:
+CROMWELLDBPORT=<DB PORT>
+CROMWELLDBNAME=<DB NAME>
+CROMWELLDBUSERNAME=<DB USER>
+CROMWELLDBPASSWORD=<DB PASSWORD>
