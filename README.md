@@ -22,7 +22,7 @@ These are more Cromwell/Broad oriented instructions and resources:
 [GATK Workflows](https://github.com/gatk-workflows?language=wdl)
 
 ### Internal WDL/Cromwell Resources
-There is a Crowmell entry in our SciWiki that you can refer to to find new resources put up by Fred Hutch researchers.  Also, you can see what is currently available in the FredHutch GitHub institution by using [this link to search results]().
+There is a Crowmell entry in our SciWiki that you can refer to to find new resources put up by Fred Hutch researchers.  Also, you can see what is currently available in the FredHutch GitHub institution by using [this link to search results](https://github.com/FredHutch?utf8=%E2%9C%93&q=wdl+OR+cromwell&type=&language=).
 
 Beyond the two basic workflows for testing included in this repository, there is an example, [unpaired variant calling workflow](https://github.com/FredHutch/tg-wdl-unpairedVariantCaller) that can be run by Fred Hutch users on campus that has example data linked vis the inputs json file. 
 
