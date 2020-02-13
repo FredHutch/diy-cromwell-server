@@ -1,5 +1,6 @@
 # diy-cromwell-server
 A repo containing instructions for running a Cromwell server on `gizmo` at the Fred Hutch.  These instructions were created and tested by Amy Paguirigan, so drop her a line if they don't work for you or you need help.  Username is `apaguiri`.  
+Alternatively, join the discussion in The Coop Slack in the [#cromwell-wdl channel](https://fhbig.slack.com/archives/CTFU13URJ) using your Fred Hutch, UW, SCHARP or Sagebase email.  
 
 
 ## What is Cromwell?
@@ -33,7 +34,7 @@ We have also been building other places to find information about both workflow 
 If you have questions about these steps, feel free to contact Amy Paguirigan (`apaguiri`) or `SciComp`.  
 
 ### Rhino Access
-Currently, to run your own Cromwell server you'll need to know how to connect to `rhino` at the Fred Hutch.  Read over at [SciWiki](https://sciwiki.fredhutch.org/) in the Scientific Computing section about Access Methods, and Technologies.  If you have never used the local cluster, you may need to file a ticket by emailing fredhutch email `scicomp` and requesting your account be set up.  To do this you'll need to specify which PI you are sponsored by/work for.  
+Currently, to run your own Cromwell server you'll need to know how to connect to `rhino` at the Fred Hutch.  While Amy has a basic R package for interacting with Cromwell via R, you may likely want to learn how to see what is happening via the `rhinos` so you'll want to read over at [SciWiki](https://sciwiki.fredhutch.org/) in the Scientific Computing section about Access Methods, and Technologies.  If you have never used the local cluster (`rhino`/`gizmo`), you may need to file a ticket by emailing fredhutch email `scicomp` and requesting your account be set up.  To do this you'll need to specify which PI you are sponsored by/work for.  
 
 ### Database Setup
 These instructions let you stand up a Cromwell server with the default maximum wall time on our HPC cluster, which is 3 days.  If you have workflows that run longer than that or you want to be able to get metadata for or restart jobs even after the server goes down, you'll want an external database.  We have found as well that by using a MySQL database for your Cromwell server, it will run faster than a file based database and be better able to handle simultaneous workflows while also making all the metadata available to you during and after the run.  
