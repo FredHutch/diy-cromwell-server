@@ -58,7 +58,7 @@ mysql> exit
 
 ## Server setup instructions
 1.  Decide where you want to keep your Cromwell configuration files.  This must be a place where `rhino` can access them, such as in your `Home` directory, which is typically the default directory when you connect to the `rhinos`.  Create a `cromwell` folder (or whatever you want to call it) and save the files in this repo's `config` folder there.  
-2.  Tailor your `cromwellParams.sh` file to be specific to your particular server (see suggestions in the file and below).
+2.  Tailor your `cromwellParams.sh` file to be specific to your particular server (see suggestions in the [template file itself](https://github.com/FredHutch/diy-cromwell-server/blob/master/config/cromwellParams.sh) and below).
 3.  Adjust, if desired, the resources requested for your server in `cromServer.sh`.  
 
 > Note:  For this server, you will want multiple cores to allow it to multi-task.  Memory is less important when you use an external database.  I have requested one `largenode` for this server but you can request less if you are likely to be only doing one workflow at a time.  
@@ -97,54 +97,17 @@ If you use the R package, when you use the `cromwellCreate` function it will ret
 
 > Note:  To test your server, you can send the `hello-gizmo` workflow that is in this repo, in the folder `helloHostname`.  
 
+## Guidance and Support
+### Design Recommendations for WDL workflows at Fred Hutch
+See our [SciWiki page](https://sciwiki.fredhutch.org/compdemos/Cromwell/) on Cromwell for more about guidance for how to start structuring and building your workflows as well as how to share them with others on campus in a findable way.  
 
-## Design Recommendations for WDL workflows at Fred Hutch
-In order to improve sharability and also leverage the R package, as well as future UI based submission tools being developed, we recommend you structure your WDL based workflows with the following input files:
+### R support
+I have a basic R package that wraps the Cromwell API allowing you to submit, monitor and kill workflow jobs on `gizmo` from R directly. It also has a function (`cromwellCreate`) that can help you set up your Cromwell server directly from R assuming your configuration files are saved where `rhino` can reach them and you know their paths, the example for which is described above. This means that you don't necessarily have to interact with the command line to do workflow submissions again.  The package is [fh.wdlR](https://github.com/FredHutch/fh.wdlR).  
 
-1.  Workflow Description file:  [Example here](/batchFileScatter/batchFileScatter.wdl)
-  - in WDL, a list of tools to be run in a sequence, likely several, otherwise using a workflow manager is not the right approach.  
-  - This file describes the process that is desired to occur every time the workflow is run.
-2.  Parameters file: [Example here](/batchFileScatter/batchFileScatter-params.json)
-  - in json, a workflow-specific list of inputs and parameters that are intended to be set for every group of workflow executions.
-  - Examples of what this input may include would be which genome to map to, reference data files to use, what environment modules to use, etc.
-3.  Batch file:  [Example here](/batchFileScatter/batchFileScatter-batch.json)
-  - in csv or tsv, a batch-specific list of the raw input data sets intended to be processed using the same set of inputs/parameters for the same workflow, WITH HEADERS!!
-  - This file is a list of data locations and any other sample/job-specific information the workflow needs.  Ideally this would be relatively minimal so that the consistency of the analysis between input data sets are as similar as possible to leverage the strengths of a reproducible workflow.  
-4.  Workflow options (OPTIONAL): [Example here](workflow-options.json)
-
-Example:
-
-```
-  {
-    "workflow_failure_mode": "NoNewCalls",
-    "default_runtime_attributes": {
-        "maxRetries": 1
-    },
-    "write_to_cache": true,
-    "read_from_cache": true
-}
-```
-
-Workflow options can be applied to any workflow to tune how the individual instance of the workflow should behave. There are more options than these that can be found in the Cromwell docs site, but of most interest are the following parameters:
-
-- `workflow_failure_mode`: `NoNewCalls` indicates that if one task fails, no new calls will be sent and all existing calls will be allowed to finish.  `ContinueWhilePossible` indicates that even if one task fails, all other task series should be continued until all possible jobs are completed either successfully or not.
-- `default_runtime_attributes.maxRetries`: The maximum number of times a job can be retried if it fails in a way that is considered a retryable failure (like if a job gets dumped or the server goes down).
-- `write_to_cache`: Do you want to write metadata about this workflow to the database to allow for future use of the cached files it might create?
-- `read_from_cache`: Do you want to query the database to determine if portions of this workflow have already completed successfully, thus they do not need to be re-computed.  
-
-## R support
-I have a basic R package that wraps the Cromwell API allowing you to submit, monitor and kill workflow jobs on `gizmo` from R directly. It also has a function (`cromwellCreate`) that can help you set up your Cromwell server directly from R assuming your configuration files are saved where `rhino` can reach them and you know their paths. This means that you don't necessarily have to interact with the command line to do workflow submissions again.  The package is [fh.wdlR](https://github.com/FredHutch/fh.wdlR).  
-
-## Workflow Publishing
-If you are ok with sharing your workflow for use by others in our community or you would like to get some help making your workflow work, please put your workflow into a GitHub repo in the Fred Hutch organization, with one workflow per repo, the above file structure for workflow, inputs and batch, and a quick README.md explaining what the workflow does, what inputs are needed, what assumptions are made.
-> Note:  In the title of the GitHub repo, please include `-wdl` (or `-cwl`) so that others can more easily find your repo and so it will show up in our Fred Hutch Project listing.
-
-## Other Fred Hutch based resources
+### Other Fred Hutch based resources
 While additional development is going on to make Cromwell work better in AWS (currently it works well in Google and SLURM among other backends), we are anticipating that it will be more widely available for use with AWS based computing.  To support that there is a growing public data set AWS S3 bucket at `fh-ctr-public-reference-data`.  Contact Amy Paguirigan or Sam Minot if you'd like something to be added here and we can help you do that.  
 
-The Coop Slack [#cromwell-wdl channel](https://fhbig.slack.com/archives/CTFU13URJ) now houses peer to peer support for Fred Hutch based users of Cromwell and WDL workflows.  Please join us and share your questions and expertise.  
-
-### Cromwell Server Customization
+## Cromwell Server Customization
 
 In `config/cromwellParams.sh` there are some variables that allow users to share a similar configuration file but tailor the particular behavior of their Cromwell server to best suit them.  The following text is also in this repo but these are the customizations you'll need to decide on for your server.
 ```
