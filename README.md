@@ -6,7 +6,7 @@ A repo containing instructions for running a Cromwell server on `gizmo` at the F
 Cromwell is a workflow manager developed by the Broad which manages the individual tasks involved in multi-step workflows, tracks job metadata, provides an API/Swagger UI interface and allows users to manage multiple workflows simultaneously.  Cromwell currently uses either CWL or WDL workflow languages, and we will focus on WDL workflows for now.  
 - [Emerging Cromwell Docs site](https://cromwell.readthedocs.io/en/stable/)
 
-### WDL Resources
+### External WDL Resources
 These plugins help when you are editing your workflow in Atom or VS Code by color coding and finding errors:
 - [WDL Viewer Package](https://atom.io/packages/atom-wdl-viewer) for Atom
 - [WDL Syntax Highlighter](https://marketplace.visualstudio.com/items?itemName=broadinstitute.wdl) for VS Code
@@ -21,19 +21,26 @@ These are more Cromwell/Broad oriented instructions and resources:
 - Some basic Broad [WDL Tutorials](https://support.terra.bio/hc/en-us/sections/360007347652?name=wdl-tutorials)
 [GATK Workflows](https://github.com/gatk-workflows?language=wdl)
 
+### Internal WDL/Cromwell Resources
+There is a Crowmell entry in our SciWiki that you can refer to to find new resources put up by Fred Hutch researchers.  Also, you can see what is currently available in the FredHutch GitHub institution by using [this link to search results]().
+
+Beyond the two basic workflows for testing included in this repository, there is an example, [unpaired variant calling workflow](https://github.com/FredHutch/tg-wdl-unpairedVariantCaller) that can be run by Fred Hutch users on campus that has example data linked vis the inputs json file. 
+
+We have also been building other places to find information about both workflow managers being supported at the Fred Hutch via [this GitHub Project](https://github.com/orgs/FredHutch/projects/8).
+
 
 ## Steps to prepare
 If you have questions about these steps, feel free to contact Amy Paguirigan (`apaguiri`) or `SciComp`.  
 
 ### Rhino Access
-Currently, to run your own Cromwell server you'll need to know how to connect to `rhino` at the Fred Hutch.  Read over at [SciWiki](https://sciwiki.fredhutch.org/) in the Scientific Computing section about Access Methods, and Technologies.  
+Currently, to run your own Cromwell server you'll need to know how to connect to `rhino` at the Fred Hutch.  Read over at [SciWiki](https://sciwiki.fredhutch.org/) in the Scientific Computing section about Access Methods, and Technologies.  If you have never used the local cluster, you may need to file a ticket by emailing fredhutch email `scicomp` and requesting your account be set up.  To do this you'll need to specify which PI you are sponsored by/work for.  
 
 ### Database Setup
 These instructions let you stand up a Cromwell server with the default maximum wall time on our HPC cluster, which is 3 days.  If you have workflows that run longer than that or you want to be able to get metadata for or restart jobs even after the server goes down, you'll want an external database.  We have found as well that by using a MySQL database for your Cromwell server, it will run faster than a file based database and be better able to handle simultaneous workflows while also making all the metadata available to you during and after the run.  
 
-We currently suggest you go to [DB4Sci](https://mydb.fredhutch.org/login) and see the Wiki entry for DB4Sci [here](https://sciwiki.fredhutch.org/scicomputing/store_databases/#db4sci--previously-mydb).  There, you will login using Fred Hutch credentials, choose `Create DB Container`, and choose the MariaDB option.  The default database container values are typically fine, but do save the `DB/Container Name`, `DB Username` and `DB Password` as you will need them for the  configuration step.  Once you click submit, a confirmation screen will appear (hopefully), and you'll need to note which `Port` is specified.  This is a 5 digit number.  
+We currently suggest you go to [DB4Sci](https://mydb.fredhutch.org/login) and see the Wiki entry for DB4Sci [here](https://sciwiki.fredhutch.org/scicomputing/store_databases/#db4sci--previously-mydb).  There, you will login using Fred Hutch credentials, choose `Create DB Container`, and choose the MariaDB option.  The default database container values are typically fine, but do save the `DB/Container Name`, `DB Username` and `DB Password` as you will need them for the  configuration step.  Once you click submit, a confirmation screen will appear (hopefully), and you'll need to note which `Port` is specified.  This is a 5 digit number currently.
 
-Once this is complete, you can file a ticket to `scicomp` to request the database to be set up in that container. Or if you are able to get onto `rhino`, you can do the following.  
+Once this is complete, you can file a ticket to `scicomp` to request the database to be set up in that container.  In the future it might be possible to have this step be part of the DB4Sci setup process but until then, you'll need to do this additional step. Or if you are able to get onto `rhino`, you can do the following to do this process yourself:
 
 ```
 mysql -p -u <DB Username> -h mydb -P <Port>
@@ -46,7 +53,7 @@ mysql> create database <DB Name>
 mysql> exit
 ```
 
- Then you're ready to go and never have to set up the database part again and you can use this database to manage all your work over time.  
+ Then you're ready to go and never have to set up the database part again and you can use this database to manage all your work over time. 
 
 ## Server setup instructions
 1.  Decide where you want to keep your Cromwell configuration files.  This must be a place where `rhino` can access them, such as in your `Home` directory, which is typically the default directory when you connect to the `rhinos`.  Create a `cromwell` folder (or whatever you want to call it) and save the files in this repo's `config` folder there.  
@@ -66,7 +73,7 @@ sbatch -o \
     2020
 ```
 
-> Note:  the second line here will save the output of the actual sbatch'd server job to `/home/cromwell/serverlogs/` with the file name being `jobID`.txt.  This is not required but is helpful initially for you to troubleshoot if your server goes down and you don't know why.  The last line here is the port you want to use for the API - change it to whatever you'd like.
+> Note:  the second line here will save the output of the actual server job itself to `/home/cromwell/serverlogs/` with the file name being `jobID`.txt.  This is not required but is helpful initially for you to troubleshoot if your server goes down and you don't know why.  The last line here is the port you want to use for the API - change it to whatever you'd like.
 
 Or from your local R instance using the [fh.wdlR R package](https://github.com/FredHutch/fh.wdlR):
 
@@ -103,6 +110,7 @@ In order to improve sharability and also leverage the R package, as well as futu
   - in csv or tsv, a batch-specific list of the raw input data sets intended to be processed using the same set of inputs/parameters for the same workflow, WITH HEADERS!!
   - This file is a list of data locations and any other sample/job-specific information the workflow needs.  Ideally this would be relatively minimal so that the consistency of the analysis between input data sets are as similar as possible to leverage the strengths of a reproducible workflow.  
 4.  Workflow options (OPTIONAL): [Example here](workflow-options.json)
+
 Example:
 
 ```
@@ -133,7 +141,7 @@ If you are ok with sharing your workflow for use by others in our community or y
 ## Other Fred Hutch based resources
 While additional development is going on to make Cromwell work better in AWS (currently it works well in Google and SLURM among other backends), we are anticipating that it will be more widely available for use with AWS based computing.  To support that there is a growing public data set AWS S3 bucket at `fh-ctr-public-reference-data`.  Contact Amy Paguirigan or Sam Minot if you'd like something to be added here and we can help you do that.  
 
-The Coop Slack [#nextflow channel](https://fhbig.slack.com/archives/CJFP1NYSZ) is currently supporting Nextflow (another workflow manager) users but workflow managers often have similar problems so that community is likely to evolve into a `workflow-manager` group rather than being specifically for Nextflow.  Please go ask questions there for now and tag Amy Paguirigan in them for help.  
+The Coop Slack [#cromwell-wdl channel](https://fhbig.slack.com/archives/CTFU13URJ) now houses peer to peer support for Fred Hutch based users of Cromwell and WDL workflows.  Please join us and share your questions and expertise.  
 
 ### Cromwell Server Customization
 
