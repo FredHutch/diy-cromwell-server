@@ -1,5 +1,13 @@
-## Read in a batch file from S3 and scatter over it using local `Gizmo` compute resources
-## Will also stage any inputs from S3 specified in the batch file to local storage for further analysis
+# This workflow takes a tab separated file where each row is a set of data to be used in each 
+# of the independent scattered task series that you have as your workflow process.  This file 
+# will, for example, have column names `sampleName`, `bamLocation`, and `bedlocation`.  This
+# allows you to know that regardless of the order of the columns in your batch file, the correct
+# inputs will be used for the tasks you define.  
+
+## This workflow allows the batch file and the inputs to be in AWS S3 storage.  The test data for this 
+## workflow are in a publicly accessible bucket, accessible to Fred Hutch on campus users.  It will
+## read the batch file from S3 and scatter over the rows of it for each task series in the scatter. 
+## In this case, the task series is to go stage any inputs from S3 specified in the batch file to local storage for further analysis
 workflow TGR_s3BatchFileScatter {
   # Batch file information
   String s3batchFile
