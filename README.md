@@ -25,7 +25,7 @@ These are more Cromwell/Broad oriented instructions and resources:
 ### Internal WDL/Cromwell Resources
 There is a Crowmell entry in our SciWiki that you can refer to to find new resources put up by Fred Hutch researchers.  Also, you can see what is currently available in the FredHutch GitHub institution by using [this link to search results](https://github.com/FredHutch?utf8=%E2%9C%93&q=wdl+OR+cromwell&type=&language=).
 
-Beyond the two basic workflows for testing included in this repository, there is an example, [unpaired variant calling workflow](https://github.com/FredHutch/tg-wdl-unpairedVariantCaller) that can be run by Fred Hutch users on campus that has example data linked vis the inputs json file. 
+Beyond the two basic workflows for testing included in this repository, there is an example, [unpaired variant calling workflow](https://github.com/FredHutch/tg-wdl-unpairedVariantCaller) that can be run by Fred Hutch users on campus that has example data linked vis the inputs json file.
 
 We have also been building other places to find information about both workflow managers being supported at the Fred Hutch via [this GitHub Project](https://github.com/orgs/FredHutch/projects/8).
 
@@ -54,7 +54,7 @@ mysql> create database <DB Name>
 mysql> exit
 ```
 
- Then you're ready to go and never have to set up the database part again and you can use this database to manage all your work over time. 
+ Then you're ready to go and never have to set up the database part again and you can use this database to manage all your work over time.
 
 ## Server setup instructions
 1.  Decide where you want to keep your Cromwell configuration files.  This must be a place where `rhino` can access them, such as in your `Home` directory, which is typically the default directory when you connect to the `rhinos`.  Create a `cromwell` folder (or whatever you want to call it) and save the files in this repo's `config` folder there.  
@@ -84,7 +84,7 @@ remotes::install_github('FredHutch/fh.wdlR')
 library(fh.wdlR)
 cromwellCreate(FredHutchId = "username", port = "2020",
         pathToServerLogs = "/some/path/cromwell/serverlogs/%A.txt",
-        pathToScript = "/some/path/cromwell/cromServer.sh",
+        pathToServerScript = "/some/path/cromwell/cromServer.sh",
         pathToParams = "/some/path/cromwell/cromwellParams.sh")
 # You can use this to confirm that the environment variable was set correctly:
 Sys.getenv("CROMWELLURL")
