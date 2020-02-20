@@ -132,3 +132,18 @@ CROMWELLDBNAME=<DB NAME>
 CROMWELLDBUSERNAME=<DB USERNAME>
 CROMWELLDBPASSWORD=<DB PASSWORD>
 ```
+
+
+## Task Defaults and Runtime Variables available
+For the gizmo backend, the following runtime variables are available that are customized to our configuration.  What is specified below is the current default as written, you can edit these in the config file if you'd like OR you can specify these variables in your `runtime` block in each task to change only the variables you want to change from the default for that particular task.  
+
+- `Int cpu = 1`
+  - An integer number of cpus you want for the task
+- `String walltime = "18:00:00"``
+  - A string of date/time that specifies how many hours/days you want to request for the task
+- `Int memory = 2000`
+  - An integer number of MB of memory you want to use for the task
+- `String partition = "campus"`
+  - Which partition you want to use, currently options are "campus" or "largenode" on `gizmo`
+- `String modules = ""`
+  - A space separated list of the environment modules you'd like to have loaded (in that order) prior to running the task.  
