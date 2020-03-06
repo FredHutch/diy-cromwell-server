@@ -12,7 +12,7 @@ source ${1}
 # ${2} is the port you want to open on the node you get for the API
 
 # Load the Cromwell Module you'd like
-module load cromwell/47-Java-1.8
+module load cromwell/49-Java-1.8
 
 # Run your server!
 java -Xms4g \
@@ -28,7 +28,7 @@ java -Xms4g \
     -Ddatabase.db.user=${CROMWELLDBUSERNAME} \
     -Ddatabase.db.password=${CROMWELLDBPASSWORD} \
     -Dwebservice.port=${2} \
-    -jar $EBROOTCROMWELL/cromwell-47.jar \
+    -jar $EBROOTCROMWELL/cromwell-49.jar \
     server
 
 
