@@ -2,6 +2,7 @@
 #SBATCH --partition=largenode
 #SBATCH --cpus-per-task=6
 #SBATCH --mem=43G
+#SBATCH -N 1
 
 ## This script needs two parameters;
 ## The first is the path to the cromwellParams.sh file that contains your customizatiosn
@@ -17,6 +18,7 @@ source ${1}
 # Load the Cromwell Module
 module load cromwell/49-Java-1.8
 
+
 # Run your server!
 java -Xms4g \
     -Dconfig.file=${CROMWELLCONFIG} \
@@ -24,9 +26,7 @@ java -Xms4g \
     -DLOG_LEVEL=INFO \
     -Dbackend.providers.gizmo.config.root=${SCRATCHPATH} \
     -Dworkflow-options.workflow-log-dir=${WORKFLOWLOGDIR} \
-    -Dworkflow-options.final_workflow_log_dir=${WORKFLOWLOGDIR} \
     -Dworkflow-options.final_workflow_outputs_dir=${WORKFLOWOUTPUTSDIR} \
-    -Dworkflow-options.final_call_logs_dir=${WORKFLOWCALLOGSDIR} \
     -Ddatabase.db.url=jdbc:mysql://mydb:${CROMWELLDBPORT}/${CROMWELLDBNAME}?rewriteBatchedStatements=true \
     -Ddatabase.db.user=${CROMWELLDBUSERNAME} \
     -Ddatabase.db.password=${CROMWELLDBPASSWORD} \
