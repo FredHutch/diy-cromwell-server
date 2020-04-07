@@ -31,10 +31,10 @@ We have also been building other places to find information about both workflow 
 
 
 ## Steps to prepare
-If you have questions about these steps, feel free to contact Amy Paguirigan (`apaguiri`) or `SciComp`.  
+If you have questions about these steps, feel free to contact Amy Paguirigan (`apaguiri`) or `scicomp`.  
 
 ### Rhino Access
-Currently, to run your own Cromwell server you'll need to know how to connect to `rhino` at the Fred Hutch.  While Amy has a basic R package for interacting with Cromwell via R, you may likely want to learn how to see what is happening via the `rhinos` so you'll want to read over at [SciWiki](https://sciwiki.fredhutch.org/) in the Scientific Computing section about Access Methods, and Technologies.  If you have never used the local cluster (`rhino`/`gizmo`), you may need to file a ticket by emailing fredhutch email `scicomp` and requesting your account be set up.  To do this you'll need to specify which PI you are sponsored by/work for.  
+Currently, to run your own Cromwell server you'll need to know how to connect to `rhino` at the Fred Hutch.  While [Amy has a basic R package](https://github.com/FredHutch/fh.wdlR) for interacting with Cromwell via R, you may likely want to learn how to see what is happening via the `rhinos` so you'll want to read over at [SciWiki](https://sciwiki.fredhutch.org/) in the Scientific Computing section about Access Methods, and Technologies.  If you have never used the local cluster (`rhino`/`gizmo`), you may need to file a ticket by emailing fredhutch email `scicomp` and requesting your account be set up.  To do this you'll need to specify which PI you are sponsored by/work for.  
 
 ### Database Setup
 These instructions let you stand up a Cromwell server with the default maximum wall time on our HPC cluster, which is 3 days.  If you have workflows that run longer than that or you want to be able to get metadata for or restart jobs even after the server goes down, you'll want an external database.  We have found as well that by using a MySQL database for your Cromwell server, it will run faster than a file based database and be better able to handle simultaneous workflows while also making all the metadata available to you during and after the run.  
@@ -95,7 +95,8 @@ If you use the R package, when you use the `cromwellCreate` function it will ret
 
 6. For using the API (via a browser, some other method of submission): On `rhino` type: `squeue -u username` to find the list of jobs you have running.  Note the node name (such as `gizmoj30`) that your server job was assigned to.  When you go your browser, you can go to `http://gizmoj30:2020` ("2020" or whatever the webservice port you chose) to use the Swagger UI to submit workflows.  
 
-> Note:  To test your server, you can send the `hello-gizmo` workflow that is in this repo, in the folder `helloHostname`.  
+
+7.  See our [Test Workflow folder](https://github.com/FredHutch/diy-cromwell-server/tree/master/testWorkflows) once your server is up and run through the tests specified in the markdown there.
 
 ## Guidance and Support
 ### Design Recommendations for WDL workflows at Fred Hutch
@@ -111,17 +112,14 @@ While additional development is going on to make Cromwell work better in AWS (cu
 
 In `config/cromwellParams.sh` there are some variables that allow users to share a similar configuration file but tailor the particular behavior of their Cromwell server to best suit them.  The following text is also in this repo but these are the customizations you'll need to decide on for your server.
 ```
-## Where do you want the working directory to be for Cromwell?  
+## Where do you want the working directory to be for Cromwell?  We suggest using our Scratch space for this.
 SCRATCHPATH=/fh/scratch/delete90/pilastname_f/cromwell-executions
 
 ## Where do you want logs about individual workflows (not jobs) to be written?
 WORKFLOWLOGDIR=/fh/fast/pilastname_f/cromwell/workflow-logs
 
-## Where do you want final output files specified by workflows to be copied for your subsequent use?
-WORKFLOWOUTPUTSDIR=/fh/fast/pilastname_f/cromwell/outputs
-
-## Where do you want individual task-level logs to be written after a workflow is successful?
-WORKFLOWCALLLOGSDIR=/fh/fast/pilastname_f/trgen/Cromwell/outputs
+## Where do you want final output files specified by workflows to be copied for your subsequent use and longer term storage?
+WORKFLOWOUTPUTSDIR=/fh/fast/pilastname_f/cromwell/workflow-outputs
 
 ## Where is your configuration file?
 CROMWELLCONFIG=/home/fh-slurm-cromwell.config
@@ -132,7 +130,7 @@ CROMWELLDBNAME=<DB NAME>
 CROMWELLDBUSERNAME=<DB USERNAME>
 CROMWELLDBPASSWORD=<DB PASSWORD>
 ```
-
+Whether these customizations are done user-by-user or lab-by-lab depend on how your group wants to interact with workflows and data.  Contact Amy Paguirigan about these issues for some advice.  
 
 ## Task Defaults and Runtime Variables available
 For the gizmo backend, the following runtime variables are available that are customized to our configuration.  What is specified below is the current default as written, you can edit these in the config file if you'd like OR you can specify these variables in your `runtime` block in each task to change only the variables you want to change from the default for that particular task.  

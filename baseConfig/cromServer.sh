@@ -3,15 +3,18 @@
 #SBATCH --cpus-per-task=6
 #SBATCH --mem=43G
 
+## This script needs two parameters;
+## The first is the path to the cromwellParams.sh file that contains your customizatiosn
+## The second is the port you'd like to use for the API
+
 source /app/Lmod/lmod/lmod/init/bash
 module use /app/easybuild/modules/all
 module purge
 
 # Read in your custom config parameters
 source ${1}
-# ${2} is the port you want to open on the node you get for the API
 
-# Load the Cromwell Module you'd like
+# Load the Cromwell Module
 module load cromwell/49-Java-1.8
 
 # Run your server!
