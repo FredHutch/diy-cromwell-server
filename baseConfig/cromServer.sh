@@ -18,7 +18,6 @@ source ${1}
 # Load the Cromwell Module
 module load cromwell/49-Java-1.8
 
-
 # Run your server!
 java -Xms4g \
     -Dconfig.file=${CROMWELLCONFIG} \
@@ -27,7 +26,7 @@ java -Xms4g \
     -Dbackend.providers.gizmo.config.root=${SCRATCHPATH} \
     -Dworkflow-options.workflow-log-dir=${WORKFLOWLOGDIR} \
     -Dworkflow-options.final_workflow_outputs_dir=${WORKFLOWOUTPUTSDIR} \
-    -Ddatabase.db.url=jdbc:mysql://mydb:${CROMWELLDBPORT}/${CROMWELLDBNAME}?rewriteBatchedStatements=true \
+    -Ddatabase.db.url=jdbc:mysql://mydb:${CROMWELLDBPORT}/${CROMWELLDBNAME}?rewriteBatchedStatements=true\&serverTimezone=UTC \
     -Ddatabase.db.user=${CROMWELLDBUSERNAME} \
     -Ddatabase.db.password=${CROMWELLDBPASSWORD} \
     -Dwebservice.port=${2} \
