@@ -1,0 +1,28 @@
+{
+  "Panel_BWA_GATK4_Annovar.ref_name": "hg38",
+  "Panel_BWA_GATK4_Annovar.ref_fasta": "/fh/fast/paguirigan_a/pub/ReferenceDataSets/genome_data/human/hg38/Homo_sapiens_assembly38.fasta",
+  "Panel_BWA_GATK4_Annovar.ref_fasta_index": "/fh/fast/paguirigan_a/pub/ReferenceDataSets/genome_data/human/hg38/Homo_sapiens_assembly38.fasta.fai",
+  "Panel_BWA_GATK4_Annovar.ref_dict": "/fh/fast/paguirigan_a/pub/ReferenceDataSets/genome_data/human/hg38/Homo_sapiens_assembly38.dict",
+  "Panel_BWA_GATK4_Annovar.ref_pac": "/fh/fast/paguirigan_a/pub/ReferenceDataSets/genome_data/human/hg38/Homo_sapiens_assembly38.fasta.pac",
+  "Panel_BWA_GATK4_Annovar.ref_sa": "/fh/fast/paguirigan_a/pub/ReferenceDataSets/genome_data/human/hg38/Homo_sapiens_assembly38.fasta.sa",
+  "Panel_BWA_GATK4_Annovar.ref_amb": "/fh/fast/paguirigan_a/pub/ReferenceDataSets/genome_data/human/hg38/Homo_sapiens_assembly38.fasta.amb",
+  "Panel_BWA_GATK4_Annovar.ref_ann": "/fh/fast/paguirigan_a/pub/ReferenceDataSets/genome_data/human/hg38/Homo_sapiens_assembly38.fasta.ann",
+  "Panel_BWA_GATK4_Annovar.ref_alt": "/fh/fast/paguirigan_a/pub/ReferenceDataSets/genome_data/human/hg38/Homo_sapiens_assembly38.fasta.alt",
+  "Panel_BWA_GATK4_Annovar.ref_bwt": "/fh/fast/paguirigan_a/pub/ReferenceDataSets/genome_data/human/hg38/Homo_sapiens_assembly38.fasta.bwt",
+  "Panel_BWA_GATK4_Annovar.dbSNP_vcf_index": "/fh/fast/paguirigan_a/pub/ReferenceDataSets/genome_data/human/hg38/Homo_sapiens_assembly38.dbsnp138.vcf.idx",
+  "Panel_BWA_GATK4_Annovar.dbSNP_vcf": "/fh/fast/paguirigan_a/pub/ReferenceDataSets/genome_data/human/hg38/Homo_sapiens_assembly38.dbsnp138.vcf",
+  "Panel_BWA_GATK4_Annovar.known_indels_sites_indices": [
+    "/fh/fast/paguirigan_a/pub/ReferenceDataSets/genome_data/human/hg38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz.tbi",
+    "/fh/fast/paguirigan_a/pub/ReferenceDataSets/genome_data/human/hg38/Homo_sapiens_assembly38.known_indels.vcf.gz.tbi"
+  ],
+  "Panel_BWA_GATK4_Annovar.known_indels_sites_VCFs": [
+    "/fh/fast/paguirigan_a/pub/ReferenceDataSets/genome_data/human/hg38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz",
+    "/fh/fast/paguirigan_a/pub/ReferenceDataSets/genome_data/human/hg38/Homo_sapiens_assembly38.known_indels.vcf.gz"
+  ],
+  "Panel_BWA_GATK4_Annovar.annovarDIR": "/fh/fast/paguirigan_a/pub/ReferenceDataSets/tool_specific_data/annovar/2018Apr16-ANNOVAR-2019Jan15-hg38humandb",
+  "Panel_BWA_GATK4_Annovar.annovar_protocols": "refGene,knownGene,dbnsfp35c,cosmic70,esp6500siv2_all,exac03,exac03nontcga,avsnp150,clinvar_20180603",
+  "Panel_BWA_GATK4_Annovar.annovar_operation": "g,f,f,f,f,f,f,f,f",
+  "Panel_BWA_GATK4_Annovar.GATKdocker": "broadinstitute/gatk:4.1.0.0",
+  "Panel_BWA_GATK4_Annovar.perldocker": "perl:5.28.0",
+  "Panel_BWA_GATK4_Annovar.bwadocker": "fredhutch/bwa:0.7.17"
+}
