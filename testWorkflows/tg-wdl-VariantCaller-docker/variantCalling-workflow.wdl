@@ -391,7 +391,7 @@ task annovar {
   String ref_name
   String annovar_protocols
   String annovar_operation
-  String annovarDIR
+  File annovarDIR
   String docker
   String base_vcf_name = basename(input_vcf, ".vcf")
   
