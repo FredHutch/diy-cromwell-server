@@ -36,7 +36,7 @@ workflow Panel_BWA_GATK4_Annovar {
   Array[File] known_indels_sites_indices
 
   # Annovar specific variables
-  File annovarDIR
+  File annovarTAR
   String annovar_protocols
   String annovar_operation
 
@@ -139,7 +139,7 @@ scatter (job in batchInfo){
         base_file_name = base_file_name,
         annovar_operation = annovar_operation,
         annovar_protocols = annovar_protocols,
-        annovarDIR = annovarDIR,
+        annovarTAR = annovarTAR,
         docker = perldocker
     }
 
@@ -391,14 +391,16 @@ task annovar {
   String ref_name
   String annovar_protocols
   String annovar_operation
-  File annovarDIR
+  File annovarTAR
   String docker
   String base_vcf_name = basename(input_vcf, ".vcf")
   
   command {
   set -eo pipefail
+
+  tar -xzvf ${annovarTAR}
   
-  perl ${annovarDIR}/annovar/table_annovar.pl ${input_vcf} ${annovarDIR}/annovar/humandb/ \
+  perl annovar/table_annovar.pl ${input_vcf} annovar/humandb/ \
     -buildver ${ref_name} \
     -outfile ${base_vcf_name} \
     -remove \
