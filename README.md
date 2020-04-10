@@ -44,7 +44,7 @@ We currently suggest you go to [DB4Sci](https://mydb.fredhutch.org/login) and se
 Once this is complete, you can file a ticket to `scicomp` to request the database to be set up in that container.  In the future it might be possible to have this step be part of the DB4Sci setup process but until then, you'll need to do this additional step. Or if you are able to get onto `rhino`, you can do the following to do this process yourself:
 
 ```
-mysql -p -u <DB Username> -h mydb -P <Port>
+mysql --host mydb --port <Port> --user <username> --password
 ```
 It will then prompt you to enter the DB password you specified during setup.  Once you are are a "mysql>" prompt, you can do the following.
 >Note, we suggest you name the database inside the container the same as the container, but you cannot include dashes in your database name.  In the future, DB4Sci may also set up the database inside the container for you, in which case you would be provided a database name as well during setup.
