@@ -22,5 +22,5 @@ Run test workflows in this order:
 ## For S3InputsConfig version:
 6.  s3batchFileScatter
   This workflow will test access to a publicly available file in an S3 bucket available to all Fred Hutch users, the ability of the Cromwell server to parse that file and kick off a scatter of parallel jobs.
-7.  tg-wdl-VariantCaller-docker-S3
-  This workflow tests whether a Cromwell server can do a multi-step, scientifically relevant mini-workflow using docker containers instead of environment modules and also input files from S3. 
+7.  tg-wdl-VariantCaller-S3
+  This workflow tests whether a Cromwell server can do a multi-step, scientifically relevant mini-workflow using environment modules and also input files from S3. 
