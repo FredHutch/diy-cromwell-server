@@ -11,8 +11,8 @@ WORKFLOWLOGDIR=/fh/fast/pilastname_f/cromwell/workflow-logs
 WORKFLOWOUTPUTSDIR=/fh/fast/pilastname_f/cromwell/outputs
 
 ## Where is your configuration file?
-### Suggestion: /fh/fast/pilastname_f/cromwell/fh-slurm-cromwell.config
-CROMWELLCONFIG=/fh/fast/pilastname_f/cromwell/fh-slurm-cromwell.config
+### Suggestion: /fh/fast/pilastname_f/cromwell/fh-slurm-cromwell.conf
+CROMWELLCONFIG=/fh/fast/pilastname_f/cromwell/fh-slurm-cromwell.conf
 
 ## DB4Sci MariaDB details:
 CROMWELLDBPORT=<DB PORT>
