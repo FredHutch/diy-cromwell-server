@@ -29,6 +29,8 @@ Beyond the two basic workflows for testing included in this repository, there is
 
 We have also been building other places to find information about both workflow managers being supported at the Fred Hutch via [this GitHub Project](https://github.com/orgs/FredHutch/projects/8).
 
+Amy also made a shiny app you can use to monitor your own Cromwell server workflows when you have a Cromwell server running on `gizmo` that can be found [here](https://cromwellapp.fredhutch.org/).
+
 
 ## Steps to prepare
 If you have questions about these steps, feel free to contact Amy Paguirigan (`apaguiri`) or `scicomp`.  
@@ -99,6 +101,9 @@ If you use the R package, when you use the `cromwellCreate` function it will ret
 7.  See our [Test Workflow folder](https://github.com/FredHutch/diy-cromwell-server/tree/master/testWorkflows) once your server is up and run through the tests specified in the markdown there.
 
 ## Guidance and Support
+### Monitoring your workflows at Fred Hutch:
+Amy also made a shiny app you can use to monitor your own Cromwell server workflows when you have a Cromwell server running on `gizmo` that can be found [here](https://cromwellapp.fredhutch.org/).  If you'd like to roll your own, you can find her shiny app code [here](https://github.com/FredHutch/shiny-cromwell).
+
 ### Design Recommendations for WDL workflows at Fred Hutch
 See our [SciWiki page](https://sciwiki.fredhutch.org/compdemos/Cromwell/) on Cromwell for more about guidance for how to start structuring and building your workflows as well as how to share them with others on campus in a findable way.  
 
