@@ -3,10 +3,16 @@
 # will, for example, have column names `sampleName`, `bamLocation`, and `bedlocation`.  This
 # allows you to know that regardless of the order of the columns in your batch file, the correct
 # inputs will be used for the tasks you define.  
-workflow parseBatchFile {
-  File batchFile
-  Array[Object] batchInfo = read_objects(batchFile)
-  scatter (job in batchInfo){
+
+## This workflow allows the batch file (and other inputs) to be in AWS S3 storage. 
+workflow s3BatchFileScatter {
+  File s3batchFile
+  Array[Object] batchInfo = read_objects(s3batchFile)
+scatter (job in batchInfo){
+  # The variable `job` here is an object that contains the column names from the
+  # batch file and a single row of data from that batch file
+  # In this case, the `String sampleName` is being assigned the value in the specific 
+  # row assigned to `job` in the `sampleName` column.
     String sampleName = job.sampleName
     File bamFile = job.bamLocation
     File bedFile = job.bedLocation
@@ -15,8 +21,7 @@ workflow parseBatchFile {
     call test {
         input: in1=sampleName, in2=bamFile, in3=bedFile
     }
-
-  }  # End Scatter over the batch file
+  }  # End Scatter
 # Outputs that will be retained when execution is complete
   output {
     Array[File] outputArray = test.item_out
