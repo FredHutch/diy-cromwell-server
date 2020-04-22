@@ -65,6 +65,8 @@ mysql> exit
 
 > Note:  For this server, you will want multiple cores to allow it to multi-task.  Memory is less important when you use an external database.  I have requested one `largenode` for this server but you can request less if you are likely to be only doing one workflow at a time.  
 
+> Note:  As we work through Cromwell testing, we are adding configuration setups that might work better for certain needs.  Carefully choose which set of Cromwell conf files you are using.  
+
 5.  Kick off your server either:
 
 By connecting to `rhino` then:
