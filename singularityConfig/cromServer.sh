@@ -30,20 +30,20 @@ jdbc_options=(\
 jdbc_connect_params=$(IFS=\& ; echo "${jdbc_options[*]}")
 
 # Ensure Singularity cache dir exists
-if [ ! -d $SINGULARITYCACHEDIR ]; then
-  mkdir -p $SINGULARITYCACHEDIR
+if [ ! -d ${SINGULARITYCACHEDIR} ]; then
+  mkdir -p ${SINGULARITYCACHEDIR}
 fi
 # Ensure scratch dir exists
-if [ ! -d $SCRATCHPATH ]; then
-  mkdir -p $SCRATCHPATH
+if [ ! -d ${SCRATCHPATH} ]; then
+  mkdir -p ${SCRATCHPATH}
 fi
 # Ensure workflow log dir exists
-if [ ! -d $WORKFLOWLOGDIR ]; then
-  mkdir -p $WORKFLOWLOGDIR
+if [ ! -d ${WORKFLOWLOGDIR} ]; then
+  mkdir -p ${WORKFLOWLOGDIR}
 fi
 # Ensure workflow output dir exists
-if [ ! -d $WORKFLOWOUTPUTSDIR ]; then
-  mkdir -p $WORKFLOWOUTPUTSDIR
+if [ ! -d ${WORKFLOWOUTPUTSDIR} ]; then
+  mkdir -p ${WORKFLOWOUTPUTSDIR}
 fi
 
 # Run your server!
@@ -52,7 +52,6 @@ java -Xms4g \
     -DLOG_MODE=pretty \
     -DLOG_LEVEL=INFO \
     -Dbackend.providers.gizmo.config.root=${SCRATCHPATH} \
-    -Dbackend.providers.gizmo.config.singularitycache=${SINGULARITYCACHEDIR} \
     -Dworkflow-options.workflow-log-dir=${WORKFLOWLOGDIR} \
     -Dworkflow-options.final_workflow_outputs_dir=${WORKFLOWOUTPUTSDIR} \
     -Ddatabase.db.url=jdbc:mysql://mydb:${CROMWELLDBPORT}/${CROMWELLDBNAME}?${jdbc_connect_params} \
