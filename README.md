@@ -71,6 +71,7 @@ mysql> exit
 
 By connecting to `rhino` then:
 ```
+mkdir -p /home/cromwell/serverlogs
 sbatch -o \
     /home/cromwell/serverlogs/%A.txt \
     /home/cromwell/cromServer.sh \
@@ -137,7 +138,7 @@ CROMWELLDBNAME=<DB NAME>
 CROMWELLDBUSERNAME=<DB USERNAME>
 CROMWELLDBPASSWORD=<DB PASSWORD>
 ```
-Whether these customizations are done user-by-user or lab-by-lab depend on how your group wants to interact with workflows and data.  Contact Amy Paguirigan about these issues for some advice.  
+Whether these customizations are done user-by-user or lab-by-lab depend on how your group wants to interact with workflows and data.  Also, as there are additional features provided in the additional config's we provide, there may be additional customization parameters that you'll need.  Check the config directories to see if there are additional copies of those files and associated server shell scripts.  If they are absent that means you can use the base setup.  Contact Amy Paguirigan about these issues for some advice.  
 
 ## Task Defaults and Runtime Variables available
 For the gizmo backend, the following runtime variables are available that are customized to our configuration.  What is specified below is the current default as written, you can edit these in the config file if you'd like OR you can specify these variables in your `runtime` block in each task to change only the variables you want to change from the default for that particular task.  
