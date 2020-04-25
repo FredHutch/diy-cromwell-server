@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --partition=largenode
 #SBATCH --cpus-per-task=6
-#SBATCH --mem=43G
+#SBATCH --mem=33G
 #SBATCH -N 1
 
 ## This script needs two parameters;
@@ -45,6 +45,8 @@ fi
 if [ ! -d ${WORKFLOWOUTPUTSDIR} ]; then
   mkdir -p ${WORKFLOWOUTPUTSDIR}
 fi
+
+export SINGULARITYCACHEDIR
 
 # Run your server!
 java -Xms4g \

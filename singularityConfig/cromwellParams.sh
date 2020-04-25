@@ -9,8 +9,7 @@ SCRATCHPATH=/fh/scratch/delete90/pilastname_f/cromwell-executions
 ## If you will be using docker containers on Gizmo, where do you want to store 
 ## your converted Singularity containers for Cromwell as a cache?  
 ### Suggestion: /fh/scratch/delete90/pilastname_f/cromwell-containers
-## Curently hardcoded to Amy's location - fix later
-SINGULARITYCACHEDIR=/fh/scratch/delete90/paguirigan_A/cromwell-containers
+SINGULARITYCACHEDIR=/fh/scratch/delete90/pilastname_f/cromwell-containers
 
 ## DB4Sci MariaDB details (remove < and >, and use unquoted text):
 CROMWELLDBPORT=<DB PORT>
