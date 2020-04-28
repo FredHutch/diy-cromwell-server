@@ -109,9 +109,10 @@ require(remotes)
 remotes::install_github('FredHutch/fh.wdlR')
 library(fh.wdlR)
 cromwellCreate(FredHutchId = "username", port = "2020",
-        pathToServerLogs = "/some/path/cromwell/serverlogs/%A.txt",
-        pathToServerScript = "/some/path/cromwell/cromServer.sh",
-        pathToParams = "/some/path/cromwell/cromwellParams.sh")
+        pathToServerLogs = "/some/path/cromwell-home/server-logs/%A.txt",
+        pathToServerScript = "/some/path/cromwell-home/cromServer.sh",
+        pathToParams = "/some/path/cromwell-home/cromwellParams.sh",
+        pathToConfig = "/some/path/cromwell-home/fh-slurm-cromwell.conf")
 # You can use this to confirm that the environment variable was set correctly:
 Sys.getenv("CROMWELLURL")
 ```
