@@ -20,3 +20,10 @@ CROMWELLDBPORT=<DB PORT>
 CROMWELLDBNAME=<DB NAME>
 CROMWELLDBUSERNAME=<DB USER>
 CROMWELLDBPASSWORD=<DB PASSWORD>
+
+
+############## SINGULARITY CUSTOMIZATIONS #################
+## If you will be using docker containers on Gizmo, where do you want to store 
+## your converted Singularity containers for Cromwell as a cache?  
+### Suggestion: /fh/scratch/delete90/pilastname_f/cromwell-containers
+SINGULARITYCACHEDIR=/fh/scratch/delete90/pilastname_f/cromwell-containers

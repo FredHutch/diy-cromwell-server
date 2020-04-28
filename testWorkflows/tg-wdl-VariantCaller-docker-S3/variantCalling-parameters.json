@@ -19,11 +19,10 @@
     "s3://fh-ctr-public-reference-data/genome_data/human/hg38/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz",
     "s3://fh-ctr-public-reference-data/genome_data/human/hg38/Homo_sapiens_assembly38.known_indels.vcf.gz"
   ],
-  "Panel_BWA_GATK4_Annovar.annovarDIR": "/fh/fast/paguirigan_a/pub/ReferenceDataSets/tool_specific_data/annovar/2018Apr16-ANNOVAR-2019Jan15-hg38humandb",
+  "Panel_BWA_GATK4_Annovar.annovarTAR": "s3://fh-ctr-public-reference-data/tool_specific_data/annovar/2018Apr16-ANNOVAR-2019Jan15-hg38humandb.tar.gz",
   "Panel_BWA_GATK4_Annovar.annovar_protocols": "refGene,knownGene,dbnsfp35c,cosmic70,esp6500siv2_all,exac03,exac03nontcga,avsnp150,clinvar_20180603",
   "Panel_BWA_GATK4_Annovar.annovar_operation": "g,f,f,f,f,f,f,f,f",
-  "Panel_BWA_GATK4_Annovar.GATKModule": "GATK/4.1.0.0-foss-2016b-Python-3.6.6",
-  "Panel_BWA_GATK4_Annovar.samtoolsModule": "BEDTools/2.27.1-foss-2016b",
-  "Panel_BWA_GATK4_Annovar.perlModule": "Perl/5.28.0-GCCcore-7.3.0",
-  "Panel_BWA_GATK4_Annovar.bwaModule": "BWA/0.7.17-foss-2016b"
+  "Panel_BWA_GATK4_Annovar.GATKdocker": "broadinstitute/gatk:4.1.0.0",
+  "Panel_BWA_GATK4_Annovar.perldocker": "perl:5.28.0",
+  "Panel_BWA_GATK4_Annovar.bwadocker": "fredhutch/bwa:0.7.17"
 }

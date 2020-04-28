@@ -59,26 +59,48 @@ mysql> exit
  Then you're ready to go and never have to set up the database part again and you can use this database to manage all your work over time.
 
 ## Server setup instructions
-1.  Decide where you want to keep your Cromwell configuration files.  This must be a place where `rhino` can access them, such as in your `Home` directory, which is typically the default directory when you connect to the `rhinos`.  Create a `cromwell` folder (or whatever you want to call it) and save the files in this repo's `config` folder there.  
-2.  Tailor your `cromwellParams.sh` file to be specific to your particular server (see suggestions in the [template file itself](https://github.com/FredHutch/diy-cromwell-server/blob/master/config/cromwellParams.sh) and below).
-3.  Adjust, if desired, the resources requested for your server in `cromServer.sh`.  
+1.  Decide where you want to keep your Cromwell configuration files.  This must be a place where `rhino` can access them, such as in your `Home` directory, which is typically the default directory when you connect to the `rhinos`.  Create a `cromwell` folder (or whatever you want to call it) and save the files contained in the desired config folder in this repo, OR follow these git instructions:
+
+### Quick git instructions on `rhino`
+```
+cd <to wherever you'd like to put all of your Cromwell stuff>
+
+git clone https://github.com/FredHutch/diy-cromwell-server.git
+
+# Makes a directory for your server logs and customization files
+mkdir -p cromwell-home
+mkdir -p ./cromwell-home/server-logs
+
+## Initially do this, but once you customize cromwellParams.sh, skip this copy:
+cp ./diy-cromwell-server/baseConfig/cromwellParams.sh ./cromwell-home/
+```
+
+
+2.  Tailor your `cromwellParams.sh` file to be specific to your particular server (see notes in the template file).
+3.  Adjust, if desired, the memory and cpu resources requested for your server in `cromServer.sh`.  
 
 > Note:  For this server, you will want multiple cores to allow it to multi-task.  Memory is less important when you use an external database.  I have requested one `largenode` for this server but you can request less if you are likely to be only doing one workflow at a time.  
 
-> Note:  As we work through Cromwell testing, we are adding configuration setups that might work better for certain needs.  Carefully choose which set of Cromwell conf files you are using.  
+> Note:  As we work through Cromwell testing, we are adding configuration setups that might work better for certain needs.  Carefully choose which set of Cromwell configuration files you are using.  
 
 5.  Kick off your server either:
 
 By connecting to `rhino` then:
 ```
+cd <to wherever you'd like to put all of your Cromwell stuff>
+
+mkdir -p cromwell-home
+mkdir -p ./cromwell-home/server-logs
+
 sbatch -o \
-    /home/cromwell/serverlogs/%A.txt \
-    /home/cromwell/cromServer.sh \
-    /home/cromwell/cromwellParams.sh \
-    2020
+    ./cromwell-home/server-logs/cromwell-v49-%A.txt \
+    ./diy-cromwell-server/baseConfig/cromServer.sh \
+    ./cromwell-home/cromwellParams.sh \
+    2020 \
+    ./diy-cromwell-server/baseConfig/fh-slurm-cromwell.conf
 ```
 
-> Note:  the second line here will save the output of the actual server job itself to `/home/cromwell/serverlogs/` with the file name being `jobID`.txt.  This is not required but is helpful initially for you to troubleshoot if your server goes down and you don't know why.  The last line here is the port you want to use for the API - change it to whatever you'd like.
+> Note:  the second line here will save the output of the actual server job itself to `./cromwell-home/server-logs/` with the file name being `cromwell-v49-jobID.txt`.  This is not required but is helpful initially for you to troubleshoot if your server goes down and you don't know why.  The number here is the port you want to use for the API - change it to whatever you'd like.  The last line is the path to the config file you downloaded.
 
 Or from your local R instance using the [fh.wdlR R package](https://github.com/FredHutch/fh.wdlR):
 
@@ -117,34 +139,40 @@ While additional development is going on to make Cromwell work better in AWS (cu
 
 ## Cromwell Server Customization
 
-In `config/cromwellParams.sh` there are some variables that allow users to share a similar configuration file but tailor the particular behavior of their Cromwell server to best suit them.  The following text is also in this repo but these are the customizations you'll need to decide on for your server.
+In `baseConfig/cromwellParams.sh` there are some variables that allow users to share a similar configuration file but tailor the particular behavior of their Cromwell server to best suit them.  The following text is also in this repo but these are the customizations you'll need to decide on for your server.
 ```
-## Where do you want the working directory to be for Cromwell?  We suggest using our Scratch space for this.
+################## WORKING DIRECTORY AND PATH CUSTOMIZATIONS ###################
+## Where do you want the working directory to be for Cromwell?  
+### Suggestion: /fh/scratch/delete90/pilastname_f/cromwell-executions
 SCRATCHPATH=/fh/scratch/delete90/pilastname_f/cromwell-executions
 
 ## Where do you want logs about individual workflows (not jobs) to be written?
+## Note: this is a default for the server and can be overwritten for a given workflow in workflow-options.
+### Suggestion: /fh/fast/pilastname_f/cromwell/workflow-logs
 WORKFLOWLOGDIR=/fh/fast/pilastname_f/cromwell/workflow-logs
 
-## Where do you want final output files specified by workflows to be copied for your subsequent use and longer term storage?
-WORKFLOWOUTPUTSDIR=/fh/fast/pilastname_f/cromwell/workflow-outputs
+## Where do you want final output files specified by workflows to be copied for your subsequent use?
+## Note: this is a default for the server and can be overwritten for a given workflow in workflow-options.
+### Suggestion: /fh/fast/pilastname_f/cromwell/outputs
+WORKFLOWOUTPUTSDIR=/fh/fast/pilastname_f/cromwell/outputs
 
-## Where is your configuration file?
-CROMWELLCONFIG=/home/fh-slurm-cromwell.config
 
-## DB4Sci MariaDB details:
+################ DATABASE CUSTOMIZATIONS #################
+## DB4Sci MariaDB details (remove < and >, and use unquoted text):
 CROMWELLDBPORT=<DB PORT>
 CROMWELLDBNAME=<DB NAME>
-CROMWELLDBUSERNAME=<DB USERNAME>
+CROMWELLDBUSERNAME=<DB USER>
 CROMWELLDBPASSWORD=<DB PASSWORD>
+
 ```
-Whether these customizations are done user-by-user or lab-by-lab depend on how your group wants to interact with workflows and data.  Contact Amy Paguirigan about these issues for some advice.  
+Whether these customizations are done user-by-user or lab-by-lab depend on how your group wants to interact with workflows and data.  Also, as there are additional features provided in the additional config's we provide, there may be additional customization parameters that you'll need.  Check the config directories to see if there are additional copies of those files and associated server shell scripts.  If they are absent that means you can use the base setup.  Contact Amy Paguirigan about these issues for some advice.  
 
 ## Task Defaults and Runtime Variables available
 For the gizmo backend, the following runtime variables are available that are customized to our configuration.  What is specified below is the current default as written, you can edit these in the config file if you'd like OR you can specify these variables in your `runtime` block in each task to change only the variables you want to change from the default for that particular task.  
 
 - `Int cpu = 1`
   - An integer number of cpus you want for the task
-- `String walltime = "18:00:00"``
+- `String walltime = "18:00:00"`
   - A string of date/time that specifies how many hours/days you want to request for the task
 - `Int memory = 2000`
   - An integer number of MB of memory you want to use for the task
