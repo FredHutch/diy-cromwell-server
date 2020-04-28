@@ -8,6 +8,20 @@ order to start up. That implies also that file inputs in S3 that you want to use
 are accessible using the particular credentials saved in your home directory.  
 
 
+## Params update
+The following variable needs to be included in your `cromwellParamsh.sh` file if you want to have the option to use Singularity as well as environment modules and to use the config in this directory.
+
+```
+############## SINGULARITY CUSTOMIZATIONS #################
+## If you will be using docker containers on Gizmo, where do you want to store
+## your converted Singularity containers for Cromwell as a cache?  
+### Suggestion: /fh/scratch/delete90/pilastname_f/cromwell-containers
+SINGULARITYCACHEDIR=/fh/scratch/delete90/pilastname_f/cromwell-containers
+````
+
+
+
+
 ## Quick git instructions on `rhino`
 ```
 git clone https://github.com/FredHutch/diy-cromwell-server.git
