@@ -14,8 +14,15 @@ WORKFLOWLOGDIR=/fh/fast/pilastname_f/cromwell/workflow-logs
 WORKFLOWOUTPUTSDIR=/fh/fast/pilastname_f/cromwell/outputs
 
 
+################ DATABASE CUSTOMIZATIONS #################
+## DB4Sci MariaDB details (remove < and >, and use unquoted text):
+CROMWELLDBPORT=<DB PORT>
+CROMWELLDBNAME=<DB NAME>
+CROMWELLDBUSERNAME=<DB USER>
+CROMWELLDBPASSWORD=<DB PASSWORD>
 
-############## SINGULARITY CUSTOMIZATIONS
+
+############## SINGULARITY CUSTOMIZATIONS #################
 ## If you will be using docker containers on Gizmo, where do you want to store 
 ## your converted Singularity containers for Cromwell as a cache?  
 ### Suggestion: /fh/scratch/delete90/pilastname_f/cromwell-containers
