@@ -34,7 +34,7 @@ cp ./diy-cromwell-server/fullConfig-withAWS/cromwellParams.sh ./cromwell-home/
 ### Go edit ./cromwell-home/cromwellParams.sh for yourself
 
 sbatch -o \
-    ./cromwell-home/server-logscromwell-v49-%A.txt \
+    ./cromwell-home/server-logs/cromwell-v49-%A.txt \
     ./diy-cromwell-server/fullConfig-withAWS/cromServer.sh \
     ./cromwell-home/cromwellParams.sh \
     2020 \
