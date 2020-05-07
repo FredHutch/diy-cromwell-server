@@ -49,7 +49,7 @@ mysql --host mydb --port <Port> --user <username> --password
 It will then prompt you to enter the DB password you specified during setup.  Once you are are a "mysql>" prompt, you can do the following.
 >Note, we suggest you name the database inside the container the same as the container, but you cannot include dashes in your database name.  In the future, DB4Sci may also set up the database inside the container for you, in which case you would be provided a database name as well during setup.
 ```
-mysql> create database <DB Name>
+mysql> create database <DB Name>;
 # It should do it's magic
 mysql> exit
 ```
@@ -71,6 +71,8 @@ mkdir -p ./cromwell-home/server-logs
 
 ## Initially do this, but once you customize cromwellParams.sh, skip this copy:
 cp ./diy-cromwell-server/baseConfig/cromwellParams.sh ./cromwell-home/
+## If you'd like to use the fullConfig, copy this one:
+cp ./diy-cromwell-server/fullConfig/cromwellParams.sh ./cromwell-home/
 ```
 
 
@@ -87,9 +89,6 @@ By connecting to `rhino` then:
 ```
 cd <to wherever you'd like to put all of your Cromwell stuff>
 
-mkdir -p cromwell-home
-mkdir -p ./cromwell-home/server-logs
-
 sbatch -o \
     ./cromwell-home/server-logs/cromwell-v49-%A.txt \
     ./diy-cromwell-server/baseConfig/cromServer.sh \
@@ -97,6 +96,18 @@ sbatch -o \
     2020 \
     ./diy-cromwell-server/baseConfig/fh-slurm-cromwell.conf
 ```
+If you'd like to use the fullConfig (so that you can use Docker/Singularity containers), do this:
+```
+cd <to wherever you'd like to put all of your Cromwell stuff>
+
+sbatch -o \
+    ./cromwell-home/server-logs/cromwell-v49-%A.txt \
+    ./diy-cromwell-server/fullConfig/cromServer.sh \
+    ./cromwell-home/cromwellParams.sh \
+    2020 \
+    ./diy-cromwell-server/fullConfig/fh-slurm-cromwell.conf
+```
+
 
 > Note:  the second line here will save the output of the actual server job itself to `./cromwell-home/server-logs/` with the file name being `cromwell-v49-jobID.txt`.  This is not required but is helpful initially for you to troubleshoot if your server goes down and you don't know why.  The number here is the port you want to use for the API - change it to whatever you'd like.  The last line is the path to the config file you downloaded.
 
