@@ -1,3 +1,4 @@
+version 1.0
 ## Consensus variant calling workflow for human panel-based DNA sequencing.
 ## Input requirements:
 ## - Pair-end sequencing data in unmapped BAM (uBAM) format that comply with the following requirements:
@@ -12,10 +13,9 @@
 ## - Annovar annotated vcfs and tabular file
 ## 
 workflow Panel_BWA_GATK4_Annovar {
+  input {
   # Batch File import
   File batchFile
-  Array[Object] batchInfo = read_objects(batchFile)
-
   # Reference Data
   String ref_name
   File ref_fasta
@@ -39,12 +39,12 @@ workflow Panel_BWA_GATK4_Annovar {
   File annovarTAR
   String annovar_protocols
   String annovar_operation
-
+  }
+  Array[Object] batchInfo = read_objects(batchFile)
   # Docker containers
-  String GATKdocker
-  String perldocker
-  String bwadocker
-
+  String GATKdocker = "broadinstitute/gatk:4.1.0.0"
+  String perldocker = "perl:5.28.0"
+  String bwadocker = "fredhutch/bwa:0.7.17"
 
 scatter (job in batchInfo){
   String sampleName = job.sampleName
@@ -164,8 +164,6 @@ task SortBed {
   File ref_dict
   String docker
   command {
-    set -eo pipefail
-
     echo "Sort bed file"
     sort -k1,1V -k2,2n -k3,3n ${unsorted_bed} > sorted.bed
 
@@ -177,7 +175,7 @@ task SortBed {
       -SD=${ref_dict}
   }
   runtime {
-    docker: "${docker}"
+    docker: docker
   }
   output {
     File intervals = "sorted.interval_list"
@@ -186,13 +184,12 @@ task SortBed {
 }
 # Read unmapped BAM, convert to FASTQ
 task SamToFastq {
+  input {
   File input_bam
   String base_file_name
   String docker
-
+  }
   command {
-    set -eo pipefail
-
     gatk --java-options "-Dsamjdk.compression_level=5 -Xms4g" \
       SamToFastq \
 			--INPUT=${input_bam} \
@@ -201,10 +198,9 @@ task SamToFastq {
 			--INCLUDE_NON_PF_READS=true 
   }
   runtime {
-    docker: "${docker}"
-    memory: "6GB"
+    docker: docker
+    memory: "6 GB"
     cpu: 2
-    partition: "campus"
   }
   output {
     File output_fastq = "${base_file_name}.fastq"
@@ -213,6 +209,7 @@ task SamToFastq {
 
 # align to genome
 task BwaMem {
+  input {
   File input_fastq
   String base_file_name
   File ref_fasta
@@ -225,20 +222,19 @@ task BwaMem {
   File ref_pac
   File ref_sa
   String docker
+  }
 
   command {
-    set -eo pipefail
-
     bwa mem \
       -p -v 3 -t 16 -M \
       ${ref_fasta} ${input_fastq} > ${base_file_name}.sam 
     samtools view -1bS -@ 15 -o ${base_file_name}.aligned.bam ${base_file_name}.sam
   }
   runtime {
-    docker: "${docker}"
-    memory: "33GB"
+    docker: docker
+    memory: "33 GB"
     cpu: 16
-    partition: "largenode"
+
   }
   output {
     File output_bam = "${base_file_name}.aligned.bam"
@@ -248,6 +244,7 @@ task BwaMem {
 
 # Merge original input uBAM file with BWA-aligned BAM file
 task MergeBamAlignment {
+  input {
   File unmapped_bam
   File aligned_bam
   String base_file_name
@@ -255,10 +252,9 @@ task MergeBamAlignment {
   File ref_fasta_index
   File ref_dict
   String docker
+  }
   command {
-    set -eo pipefail
-
-    gatk --java-options "-Dsamjdk.compression_level=5 -XX:-UseGCOverheadLimit -Xmx8g" \
+    gatk --java-options "-Dsamjdk.compression_level=5 -XX:-UseGCOverheadLimit -Xms4g" \
       MergeBamAlignment \
       --VALIDATION_STRINGENCY SILENT \
       --EXPECTED_ORIENTATIONS FR \
@@ -281,8 +277,8 @@ task MergeBamAlignment {
       --CREATE_INDEX true
   }
   runtime {
-    docker: "${docker}"
-    memory: "16GB"
+    docker: docker
+    memory: "16 GB"
     cpu: 4
   }
   output {
@@ -293,6 +289,7 @@ task MergeBamAlignment {
 
  #Generate Base Quality Score Recalibration (BQSR) model and apply it
 task ApplyBaseRecalibrator {
+  input {
   File input_bam
   File intervals 
   File input_bam_index
@@ -305,9 +302,8 @@ task ApplyBaseRecalibrator {
   File ref_fasta
   File ref_fasta_index
   String docker
+  }
   command {
-  set -eo pipefail
-
   samtools index ${input_bam}
   
   gatk --java-options "-Xms4g" \
@@ -334,10 +330,10 @@ task ApplyBaseRecalibrator {
 
   }
   runtime {
-    docker: "${docker}"
-    memory: "33GB"
+    docker: docker
+    memory: "32 GB"
     cpu: 6
-    partition: "largenode"
+
   }
   output {
     File recalibrated_bam = "${base_file_name}.recal.bam"
@@ -349,6 +345,7 @@ task ApplyBaseRecalibrator {
 
 # HaplotypeCaller per-sample
 task HaplotypeCaller {
+  input {
   File input_bam
   File input_bam_index
   String base_file_name
@@ -358,10 +355,9 @@ task HaplotypeCaller {
   File ref_fasta_index
   File dbSNP_vcf
   String docker
+  }
 
   command {
-    set -eo pipefail
-
     gatk --java-options "-Xmx4g" \
       HaplotypeCaller \
       -R ${ref_fasta} \
@@ -372,7 +368,7 @@ task HaplotypeCaller {
     }
 
   runtime {
-    docker: "${docker}"
+    docker: docker
     memory: "30GB"
     cpu: 4
   }
@@ -386,6 +382,7 @@ task HaplotypeCaller {
 
 # annotate with annovar
 task annovar {
+  input {
   File input_vcf
   String base_file_name
   String ref_name
@@ -393,11 +390,10 @@ task annovar {
   String annovar_operation
   File annovarTAR
   String docker
+  }
   String base_vcf_name = basename(input_vcf, ".vcf")
   
   command {
-  set -eo pipefail
-
   tar -xzvf ${annovarTAR}
   
   perl annovar/table_annovar.pl ${input_vcf} annovar/humandb/ \
@@ -410,7 +406,7 @@ task annovar {
   }
 
   runtime {
-    docker: "${docker}"
+    docker: docker
   }
 
   output {
