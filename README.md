@@ -3,27 +3,10 @@ A repo containing instructions for running a Cromwell server on `gizmo` at the F
 Alternatively, join the discussion in The Coop Slack in the [#cromwell-wdl channel](https://fhbig.slack.com/archives/CTFU13URJ) using your Fred Hutch, UW, SCHARP or Sagebase email.  
 
 
-## What is Cromwell?
-Cromwell is a workflow manager developed by the Broad which manages the individual tasks involved in multi-step workflows, tracks job metadata, provides an API/Swagger UI interface and allows users to manage multiple workflows simultaneously.  Cromwell currently uses either CWL or WDL workflow languages, and we will focus on WDL workflows for now.  
-- [Emerging Cromwell Docs site](https://cromwell.readthedocs.io/en/stable/)
+## Cromwell Resources
+Cromwell is a workflow manager developed by the Broad which manages the individual tasks involved in multi-step workflows, tracks job metadata, provides an API/Swagger UI interface and allows users to manage multiple workflows simultaneously.  Cromwell currently uses either CWL or WDL workflow languages, and we will focus on WDL workflows for now. [Learn more on the Fred Hutch wiki about using Cromwell at Fred Hutch.](https://sciwiki.fredhutch.org/compdemos/Cromwell/)
 
-### External WDL Resources
-These plugins help when you are editing your workflow in Atom or VS Code by color coding and finding errors:
-- [WDL Viewer Package](https://atom.io/packages/atom-wdl-viewer) for Atom
-- [WDL Syntax Highlighter](https://marketplace.visualstudio.com/items?itemName=broadinstitute.wdl) for VS Code
-
-These relate to the WDL workflow language itself and example workflows to start from:
-- [Open WDL](https://github.com/openwdl/wdl) for more about development of WDL as a standard
-- [bioWDL](https://biowdl.github.io/) for template workflows relating to bioinformatics/sequencing analysis
-
-These are more Cromwell/Broad oriented instructions and resources:
-- Cromwell [GitHub Repo](https://github.com/broadinstitute/cromwell)
-- Broad WDL User Guide and tutorials have moved over to the [Terra site](https://support.terra.bio/hc/en-us/sections/360007274612-WDL-Documentation) and thus are a bit in transition
-- Some basic Broad [WDL Tutorials](https://support.terra.bio/hc/en-us/sections/360007347652?name=wdl-tutorials)
-[GATK Workflows](https://github.com/gatk-workflows?language=wdl)
-
-### Internal WDL/Cromwell Resources
-There is a Crowmell entry in our SciWiki that you can refer to to find new resources put up by Fred Hutch researchers.  Also, you can see what is currently available in the FredHutch GitHub institution by using [this link to search results](https://github.com/FredHutch?utf8=%E2%9C%93&q=wdl+OR+cromwell&type=&language=).
+You can see what is currently available in the FredHutch GitHub institution by using [this link to search results](https://github.com/FredHutch?utf8=%E2%9C%93&q=wdl+OR+cromwell&type=&language=).
 
 We have also been building other places to find information about both workflow managers being supported at the Fred Hutch via [this GitHub Project](https://github.com/orgs/FredHutch/projects/8).
 
@@ -57,6 +40,7 @@ mysql> exit
  Then you're ready to go and never have to set up the database part again and you can use this database to manage all your work over time.
 
 ## Server setup instructions
+
 1.  Decide where you want to keep your Cromwell configuration files.  This must be a place where `rhino` can access them, such as in your `Home` directory, which is typically the default directory when you connect to the `rhinos`.  Create a `cromwell` folder (or whatever you want to call it) and save the files contained in the desired config folder in this repo, OR follow these git instructions:
 
 ### Quick git instructions on `rhino`
