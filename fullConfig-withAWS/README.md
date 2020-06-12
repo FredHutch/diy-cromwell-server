@@ -1,24 +1,11 @@
 # fullConfig-withAWS
 
-This config set up will provide you a Cromwell server on `gizmo` that submits jobs to `gizmo` and uses files in Fast/Scratch OR in AWS S3 but allows you to specify environment modules, OR docker container in which case Singularity will be used to run tasks.
+This config set up will provide you a Cromwell server on `gizmo` that submits jobs to `gizmo` using the Bionic nodes.  Workflows can access files in Fast/Scratch (our local filesystem) or in AWS S3, by specifying either the full path in the filesystem (e.g. `/fh/fast/lastname-f/folder`) or the S3 prefix (e.g. `s3://bucket-name/folder`).  It allows you to specify environment modules, or docker container in which case under the hood, Singularity will be used to run tasks, though that requires no additional setup on your part.  Simply specify the docker container in DockerHub in your task runtime section as normal.  
 
 >Note:  This version of the configuration file will NOT run successfully unless you've
 already followed the instructions [here](https://sciwiki.fredhutch.org/scicomputing/access_credentials/#amazon-web-services-aws) to create a hidden file in your home dir that this config will look for in
 order to start up. That implies also that file inputs in S3 that you want to use in a workflow
 are accessible using the particular credentials saved in your home directory.  
-
-
-## Params update
-The following variable needs to be included in your `cromwellParamsh.sh` file if you want to have the option to use Singularity as well as environment modules and to use the config in this directory.
-
-```
-############## SINGULARITY CUSTOMIZATIONS #################
-## If you will be using docker containers on Gizmo, where do you want to store
-## your converted Singularity containers for Cromwell as a cache?  
-### Suggestion: /fh/scratch/delete90/pilastname_f/cromwell-containers
-SINGULARITYCACHEDIR=/fh/scratch/delete90/pilastname_f/cromwell-containers
-````
-
 
 
 
@@ -35,8 +22,8 @@ cp ./diy-cromwell-server/fullConfig-withAWS/cromwellParams.sh ./cromwell-home/
 
 sbatch -o \
     ./cromwell-home/server-logs/cromwell-v49-%A.txt \
-    ./diy-cromwell-server/fullConfig-withAWS/cromServer.sh \
+    ./diy-cromwell-server/cromServer.sh \
     ./cromwell-home/cromwellParams.sh \
     2020 \
-    ./diy-cromwell-server/fullConfig-withAWS/fh-slurm-sing-S3-cromwell.conf
+    ./diy-cromwell-server/fullConfig-withAWS/fh-S3-cromwell.conf
 ```

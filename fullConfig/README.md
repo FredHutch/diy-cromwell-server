@@ -1,19 +1,6 @@
 # fullConfig
 
-This config set up will provide you a Cromwell server on `gizmo` that submits jobs to `gizmo` and uses files in Fast/Scratch but allows you to specify environment modules, OR docker container in which case Singularity will be used to run tasks.
-
-## Params update
-The following variable needs to be included in your `cromwellParamsh.sh` file if you want to have the option to use Singularity as well as environment modules and to use the config in this directory.
-
-```
-
-############## SINGULARITY CUSTOMIZATIONS #################
-## If you will be using docker containers on Gizmo, where do you want to store
-## your converted Singularity containers for Cromwell as a cache?  
-### Suggestion: /fh/scratch/delete90/pilastname_f/cromwell-containers
-SINGULARITYCACHEDIR=/fh/scratch/delete90/pilastname_f/cromwell-containers
-````
-
+This config set up will provide you a Cromwell server on `gizmo` that submits jobs to `gizmo` using the Bionic nodes.  Workflows can access files in Fast/Scratch (our local filesystem).  It allows you to specify environment modules, OR docker container in which case under the hood, Singularity will be used to run tasks, though that requires no additional setup on your part.  Simply specify the docker container in DockerHub in your task runtime section as normal.  
 
 
 ## Quick git instructions on `rhino`
@@ -29,8 +16,8 @@ cp ./diy-cromwell-server/fullConfig/cromwellParams.sh ./cromwell-home/
 
 sbatch -o \
     ./cromwell-home/server-logs/cromwell-v49-%A.txt \
-    ./diy-cromwell-server/fullConfig/cromServer.sh \
+    ./diy-cromwell-server/cromServer.sh \
     ./cromwell-home/cromwellParams.sh \
     2020 \
-    ./diy-cromwell-server/fullConfig/fh-slurm-sing-cromwell.conf
+    ./diy-cromwell-server/fullConfig/fh-cromwell.conf
 ```
