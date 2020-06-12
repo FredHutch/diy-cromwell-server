@@ -34,6 +34,7 @@ jdbc_options=(\
 jdbc_connect_params=$(IFS=\& ; echo "${jdbc_options[*]}")
 
 ## Basic Working Dir's
+SCRATCHPATH=${SCRATCHDIR}/cromwell-executions
 # Ensure scratch dir exists
 if [ ! -d ${SCRATCHPATH} ]; then
   mkdir -p ${SCRATCHPATH}

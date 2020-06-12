@@ -1,7 +1,7 @@
 ################## WORKING DIRECTORY AND PATH CUSTOMIZATIONS ###################
-## Where do you want the working directory to be for Cromwell?  
-### Suggestion: /fh/scratch/delete90/pilastname_f/cromwell-executions
-SCRATCHPATH=/fh/scratch/delete90/pilastname_f/cromwell-executions
+## Where do you want the working directory to be for Cromwell (note: this process will create a subdirectory here called "cromwell-executions")?  
+### Suggestion: /fh/scratch/delete90/pilastname_f
+SCRATCHDIR=/fh/scratch/delete90/pilastname_f
 
 ## Where do you want logs about individual workflows (not jobs) to be written?
 ## Note: this is a default for the server and can be overwritten for a given workflow in workflow-options.
