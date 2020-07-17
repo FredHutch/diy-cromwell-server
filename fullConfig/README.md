@@ -15,7 +15,7 @@ cp ./diy-cromwell-server/fullConfig/cromwellParams.sh ./cromwell-home/
 ### Go edit ./cromwell-home/cromwellParams.sh for yourself
 
 sbatch -o \
-    ./cromwell-home/server-logs/cromwell-v49-%A.txt \
+    ./cromwell-home/server-logs/cromwell-v52-%A.txt \
     ./diy-cromwell-server/cromServer.sh \
     ./cromwell-home/cromwellParams.sh \
     2020 \

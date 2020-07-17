@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --partition=campus-new
-#SBATCH --cpus-per-task=6
+#SBATCH --cpus-per-task=4
 #SBATCH --time="7-0"
 #SBATCH -N 1
 
@@ -20,7 +20,7 @@ module purge
 source ${1}
 
 # Load the Cromwell Module
-module load cromwell/49-Java-1.8
+module --ignore-cache load cromwell/52-Java-1.8
 
 # All this to make it a little more readable.  Put JDBC connection
 # options in a bash array
@@ -33,9 +33,12 @@ jdbc_options=(\
 # see here: https://stackoverflow.com/questions/1527049/how-can-i-join-elements-of-an-array-in-bash
 jdbc_connect_params=$(IFS=\& ; echo "${jdbc_options[*]}")
 
-## Basic Working Dir's
-SCRATCHPATH=${SCRATCHDIR}/cromwell-executions
 # Ensure scratch dir exists
+if [ ! -d ${SCRATCHDIR} ]; then
+  mkdir -p ${SCRATCHDIR}
+fi
+SCRATCHPATH=${SCRATCHDIR}/cromwell-executions
+# Ensure scratch path exists
 if [ ! -d ${SCRATCHPATH} ]; then
   mkdir -p ${SCRATCHPATH}
 fi
@@ -68,7 +71,7 @@ java -Xms8g \
     -Ddatabase.db.user=${CROMWELLDBUSERNAME} \
     -Ddatabase.db.password=${CROMWELLDBPASSWORD} \
     -Dwebservice.port=${2} \
-    -jar $EBROOTCROMWELL/cromwell-49.jar \
+    -jar $EBROOTCROMWELL/cromwell-52.jar \
     server
 
 

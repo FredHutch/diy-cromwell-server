@@ -69,7 +69,7 @@ Connecting to `rhino` then (note:  change the port from `2020` here to whatever 
 cd <to wherever you'd like to put all of your Cromwell stuff>
 
 sbatch -o \
-    ./cromwell-home/server-logs/cromwell-v49-%A.txt \
+    ./cromwell-home/server-logs/cromwell-v52-%A.txt \
     ./diy-cromwell-server/cromServer.sh \
     ./cromwell-home/cromwellParams.sh \
     2020 \
@@ -80,7 +80,7 @@ If you'd like to use file inputs in AWS S3 and you have AWS credentials saved in
 cd <to wherever you'd like to put all of your Cromwell stuff>
 
 sbatch -o \
-    ./cromwell-home/server-logs/cromwell-v49-%A.txt \
+    ./cromwell-home/server-logs/cromwell-v52-%A.txt \
     ./diy-cromwell-server/cromServer.sh \
     ./cromwell-home/cromwellParams.sh \
     2020 \
@@ -88,7 +88,7 @@ sbatch -o \
 ```
 
 
-> Note:  the second line of these sbatch commands will save the output of the actual server job itself to `./cromwell-home/server-logs/` with the file name being `cromwell-v49-jobID.txt`.  This is not required but is helpful initially for you to troubleshoot if your server goes down and you don't know why.  The number on the fourth line is the port you want to use for the API - change it to whatever you'd like.  The last line is the path to the config file you downloaded.
+> Note:  the second line of these sbatch commands will save the output of the actual server job itself to `./cromwell-home/server-logs/` with the file name being `cromwell-v52-jobID.txt`.  This is not required but is helpful initially for you to troubleshoot if your server goes down and you don't know why.  The number on the fourth line is the port you want to use for the API - change it to whatever you'd like.  The last line is the path to the config file you downloaded.
 
 Or from your local R instance using the [fh.wdlR R package](https://github.com/FredHutch/fh.wdlR), using the correct path to the configuration file you'd like to use (either the fullConfig or fullConfig-withAWS):
 
@@ -97,7 +97,7 @@ require(remotes)
 remotes::install_github('FredHutch/fh.wdlR')
 library(fh.wdlR)
 cromwellCreate(FredHutchId = "username", port = "2020",
-        pathToServerLogs = "/some/path/cromwell-home/server-logs/%A.txt",
+        pathToServerLogs = "/some/path/cromwell-home/server-logs/cromwell-v52-%A.txt",
         pathToServerScript = "/some/path/cromwell-home/cromServer.sh",
         pathToParams = "/some/path/cromwell-home/cromwellParams.sh",
         pathToConfig = "/some/path/cromwell-home/fh-cromwell.conf")
@@ -131,9 +131,9 @@ While additional development is going on to make Cromwell work better in AWS (cu
 In `cromwellParams.sh` there are some variables that allow users to share a similar configuration file but tailor the particular behavior of their Cromwell server to best suit them.  The following text is also in this repo but these are the customizations you'll need to decide on for your server.
 ```
 ################## WORKING DIRECTORY AND PATH CUSTOMIZATIONS ###################
-## Where do you want the working directory to be for Cromwell?  
-### Suggestion: /fh/scratch/delete90/pilastname_f/cromwell-executions
-SCRATCHPATH=/fh/scratch/delete90/pilastname_f/cromwell-executions
+## Where do you want the working directory to be for Cromwell (note: this process will create a subdirectory here called "cromwell-executions")?  
+### Suggestion: /fh/scratch/delete90/pilastname_f/username/
+SCRATCHDIR=/fh/scratch/delete90/pilastname_f/username/
 
 ## Where do you want logs about individual workflows (not jobs) to be written?
 ## Note: this is a default for the server and can be overwritten for a given workflow in workflow-options.
@@ -166,6 +166,6 @@ For the gizmo backend, the following runtime variables are available that are cu
 - `Int memory = 2000`
   - An integer number of MB of memory you want to use for the task
 - `String partition = "campus-new"`
-  - Which partition you want to use, currently options are "campus" or "largenode" on `gizmo`
+  - Which partition you want to use, currently the only Bionic option is `campus-new`
 - `String modules = ""`
-  - A space separated list of the environment modules you'd like to have loaded (in that order) prior to running the task.  
+  - A space-separated list of the environment modules you'd like to have loaded (in that order) prior to running the task.  
