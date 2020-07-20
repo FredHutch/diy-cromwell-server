@@ -20,7 +20,7 @@ module purge
 source ${1}
 
 # Load the Cromwell Module
-module load cromwell/52-Java-1.8
+module --ignore-cache load cromwell/52-Java-1.8
 
 # All this to make it a little more readable.  Put JDBC connection
 # options in a bash array
@@ -53,10 +53,11 @@ fi
 
 ## Singularity specific 
 # Ensure Singularity cache dir exists
-CACHE_DIR=${SCRATCHPATH}/.singularity-cache
-if [ ! -d ${CACHE_DIR} ]; then
-  mkdir -p ${CACHE_DIR}
+SINGULARITYCACHEDIR=${SCRATCHPATH}/.singularity-cache
+if [ ! -d ${SINGULARITYCACHEDIR} ]; then
+  mkdir -p ${SINGULARITYCACHEDIR}
 fi
+export SINGULARITYCACHEDIR
 
 # Run your server!
 java -Xms8g \
