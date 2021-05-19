@@ -3,6 +3,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --time="7-0"
 #SBATCH -N 1
+#SBATCH --job-name="cromwellServer"
 
 ## This script needs three parameters;
 ## The first is the path to the cromwellParams.sh file that contains your customizations
@@ -13,14 +14,11 @@ source /app/lmod/lmod/init/bash
 module use /app/modules/all
 module purge
 
-
-### ADD TEST HERE TO CONFIRM THAT .AWS CREDENTIALS ARE AVAILABLE OR THIS WILL FAIL FOR FULLCONFIG-WITHAWS #####
-
 # Read in your custom config parameters
 source ${1}
 
 # Load the Cromwell Module
-module --ignore-cache load cromwell/52-Java-1.8
+module --ignore-cache load cromwell/57-Java-1.8
 
 # All this to make it a little more readable.  Put JDBC connection
 # options in a bash array
@@ -60,10 +58,12 @@ fi
 export SINGULARITYCACHEDIR
 
 # Run your server!
-java -Xms8g \
+java -Xms28g -Xmx31g \
+    -XX:+UseParallelGC \
+    -XX:ParallelGCThreads=${NCORES} \
     -Dconfig.file=${3} \
     -DLOG_MODE=pretty \
-    -DLOG_LEVEL=INFO \
+    -DLOG_LEVEL=WARN \
     -Dbackend.providers.gizmo.config.root=${SCRATCHPATH} \
     -Dworkflow-options.workflow-log-dir=${WORKFLOWLOGDIR} \
     -Dworkflow-options.final_workflow_outputs_dir=${WORKFLOWOUTPUTSDIR} \
@@ -71,7 +71,7 @@ java -Xms8g \
     -Ddatabase.db.user=${CROMWELLDBUSERNAME} \
     -Ddatabase.db.password=${CROMWELLDBPASSWORD} \
     -Dwebservice.port=${2} \
-    -jar $EBROOTCROMWELL/cromwell-52.jar \
+    -jar $EBROOTCROMWELL/cromwell-57.jar \
     server
 
 
