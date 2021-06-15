@@ -17,7 +17,7 @@ Amy also made a shiny app you can use to monitor your own Cromwell server workfl
 If you have questions about these steps, feel free to contact Amy Paguirigan (`apaguiri`) or `scicomp`.  
 
 ### Rhino Access
-Currently, to run your own Cromwell server you'll need to know how to connect to `rhino` at the Fred Hutch.  While [Amy has a basic R package](https://github.com/FredHutch/fh.wdlR) for interacting with Cromwell via R, you may likely want to learn how to see what is happening via the `rhinos` so you'll want to read over at [SciWiki](https://sciwiki.fredhutch.org/) in the Scientific Computing section about Access Methods, and Technologies.  If you have never used the local cluster (`rhino`/`gizmo`), you may need to file a ticket by emailing fredhutch email `scicomp` and requesting your account be set up.  To do this you'll need to specify which PI you are sponsored by/work for.  
+Currently, to run your own Cromwell server you'll need to know how to connect to `rhino` at the Fred Hutch.  While [I has a basic R package](https://github.com/FredHutch/fh.wdlR) for interacting with Cromwell via R, you may likely want to learn how to see what is happening via the `rhinos` so you'll want to read over at [SciWiki](https://sciwiki.fredhutch.org/) in the Scientific Computing section about Access Methods, and Technologies.  If you have never used the local cluster (`rhino`/`gizmo`), you may need to file a ticket by emailing fredhutch email `scicomp` and requesting your account be set up.  To do this you'll need to specify which PI you are sponsored by/work for.  
 
 ### Database Setup
 These instructions let you stand up a Cromwell server for 7 days at a time.  If you have workflows that run longer than that or you want to be able to get metadata for or restart jobs even after the server goes down, you'll want an external database to keep track of your progress even if your server goes down (for whatever reason). It also will allow your future workflows to use cached copies of data when the exact task has already been done (and recorded in the database).  We have found as well that by using a MySQL database for your Cromwell server, it will run faster and be better able to handle simultaneous workflows while also making all the metadata available to you during and after the run.  
@@ -61,7 +61,7 @@ cp ./diy-cromwell-server/cromwellParams.sh ./cromwell-home/
 2.  Tailor your `cromwellParams.sh` file to be specific to your particular server (see notes in the version of the file in this repo).
 3.  Adjust, if desired, the memory and cpu resources requested for your server in `cromServer.sh`.  
 
-> Note:  For this server, you will want multiple cores to allow it to multi-task.  Memory is less important when you use an external database.  If you notice issues, the particular resource request for the server job itself might be a good place to start adjusting, in conjunction with some guidance from SciComp or the Slack WDL channel folks.
+> Note:  For this server, you will want multiple cores to allow it to multi-task.  Memory is less important when you use an external database.  If you notice issues, the particular resource request for the server job itself might be a good place to start adjusting, in conjunction with some guidance from SciComp or the Slack [Question and Answer channel](https://fhbig.slack.com/archives/CD3HGJHJT) folks.
 
 5.  Kick off your Cromwell server by either:
 
@@ -116,7 +116,7 @@ If you use the R package, when you use the `cromwellCreate` function it will ret
 
 ## Guidance and Support
 ### Monitoring your workflows at Fred Hutch:
-Amy also made a shiny app you can use to monitor your own Cromwell server workflows when you have a Cromwell server running on `gizmo` that can be found [here](https://cromwellapp.fredhutch.org/).  If you'd like to roll your own, you can find her shiny app code [here](https://github.com/FredHutch/shiny-cromwell).
+I made a shiny app you can use to monitor your own Cromwell server workflows when you have a Cromwell server running on `gizmo` that can be found [here](https://cromwellapp.fredhutch.org/).  If you'd like to roll your own, you can find my shiny app code [here](https://github.com/FredHutch/shiny-cromwell).
 
 ### Design Recommendations for WDL workflows at Fred Hutch
 See our [SciWiki page](https://sciwiki.fredhutch.org/compdemos/Cromwell/) on Cromwell for more about guidance for how to start structuring and building your workflows as well as how to share them with others on campus in a findable way.  
