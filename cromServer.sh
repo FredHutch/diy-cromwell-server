@@ -60,7 +60,7 @@ export SINGULARITYCACHEDIR
 # Run your server!
 java -Xms28g -Xmx31g \
     -XX:+UseParallelGC \
-    -XX:ParallelGCThreads=${NCORES} \
+    -XX:ParallelGCThreads=4 \
     -Dconfig.file=${3} \
     -DLOG_MODE=pretty \
     -DLOG_LEVEL=WARN \
