@@ -160,19 +160,22 @@ scatter (job in batchInfo){
 
 # Prepare bed file and check sorting
 task SortBed {
+  input {
   File unsorted_bed
   File ref_dict
   String docker
+  }
   command {
+    set -eo
     echo "Sort bed file"
-    sort -k1,1V -k2,2n -k3,3n ${unsorted_bed} > sorted.bed
+    sort -k1,1V -k2,2n -k3,3n ~{unsorted_bed} > sorted.bed
 
     echo "Transform bed file to intervals list with Picard----------------------------------------"
     gatk --java-options "-Xms4g" \
       BedToIntervalList \
       -I=sorted.bed \
       -O=sorted.interval_list \
-      -SD=${ref_dict}
+      -SD=~{ref_dict}
   }
   runtime {
     docker: docker
@@ -190,12 +193,13 @@ task SamToFastq {
   String docker
   }
   command {
+    set -eo
     gatk --java-options "-Dsamjdk.compression_level=5 -Xms4g" \
       SamToFastq \
-			--INPUT=${input_bam} \
-			--FASTQ=${base_file_name}.fastq \
-			--INTERLEAVE=true \
-			--INCLUDE_NON_PF_READS=true 
+        --INPUT=~{input_bam} \
+        --FASTQ=~{base_file_name}.fastq \
+        --INTERLEAVE=true \
+        --INCLUDE_NON_PF_READS=true 
   }
   runtime {
     docker: docker
@@ -203,7 +207,7 @@ task SamToFastq {
     cpu: 2
   }
   output {
-    File output_fastq = "${base_file_name}.fastq"
+    File output_fastq = "~{base_file_name}.fastq"
   }
 }
 
@@ -225,10 +229,11 @@ task BwaMem {
   }
 
   command {
+    set -eo
     bwa mem \
       -p -v 3 -t 16 -M \
-      ${ref_fasta} ${input_fastq} > ${base_file_name}.sam 
-    samtools view -1bS -@ 15 -o ${base_file_name}.aligned.bam ${base_file_name}.sam
+      ~{ref_fasta} ~{input_fastq} > ~{base_file_name}.sam 
+    samtools view -1bS -@ 15 -o ~{base_file_name}.aligned.bam ~{base_file_name}.sam
   }
   runtime {
     docker: docker
@@ -237,7 +242,7 @@ task BwaMem {
 
   }
   output {
-    File output_bam = "${base_file_name}.aligned.bam"
+    File output_bam = "~{base_file_name}.aligned.bam"
   }
 }
 
@@ -254,15 +259,16 @@ task MergeBamAlignment {
   String docker
   }
   command {
+    set -eo
     gatk --java-options "-Dsamjdk.compression_level=5 -XX:-UseGCOverheadLimit -Xms4g" \
       MergeBamAlignment \
       --VALIDATION_STRINGENCY SILENT \
       --EXPECTED_ORIENTATIONS FR \
       --ATTRIBUTES_TO_RETAIN X0 \
-      --ALIGNED_BAM ${aligned_bam} \
-      --UNMAPPED_BAM ${unmapped_bam} \
-      --OUTPUT ${base_file_name}.merged.bam \
-      --REFERENCE_SEQUENCE ${ref_fasta} \
+      --ALIGNED_BAM ~{aligned_bam} \
+      --UNMAPPED_BAM ~{unmapped_bam} \
+      --OUTPUT ~{base_file_name}.merged.bam \
+      --REFERENCE_SEQUENCE ~{ref_fasta} \
       --PAIRED_RUN true \
       --SORT_ORDER coordinate \
       --IS_BISULFITE_SEQUENCE false \
@@ -282,8 +288,8 @@ task MergeBamAlignment {
     cpu: 4
   }
   output {
-    File output_bam = "${base_file_name}.merged.bam"
-    File output_bai = "${base_file_name}.merged.bai"
+    File output_bam = "~{base_file_name}.merged.bam"
+    File output_bai = "~{base_file_name}.merged.bai"
   }
 }
 
@@ -304,29 +310,30 @@ task ApplyBaseRecalibrator {
   String docker
   }
   command {
-  samtools index ${input_bam}
+    set -3o
+  samtools index ~{input_bam}
   
   gatk --java-options "-Xms4g" \
       BaseRecalibrator \
-      -R ${ref_fasta} \
-      -I ${input_bam} \
-      -O ${base_file_name}.recal_data.csv \
-      --known-sites ${dbSNP_vcf} \
-      --known-sites ${sep=" --known-sites " known_indels_sites_VCFs} \
-      --intervals ${intervals} \
+      -R ~{ref_fasta} \
+      -I ~{input_bam} \
+      -O ~{base_file_name}.recal_data.csv \
+      --known-sites ~{dbSNP_vcf} \
+      --known-sites ~{sep=" --known-sites " known_indels_sites_VCFs} \
+      --intervals ~{intervals} \
       --interval-padding 100 
 
   gatk --java-options "-Xms4g" \
       ApplyBQSR \
-      -bqsr ${base_file_name}.recal_data.csv \
-      -I ${input_bam} \
-      -O ${base_file_name}.recal.bam \
-      -R ${ref_fasta} \
-      --intervals ${intervals} \
+      -bqsr ~{base_file_name}.recal_data.csv \
+      -I ~{input_bam} \
+      -O ~{base_file_name}.recal.bam \
+      -R ~{ref_fasta} \
+      --intervals ~{intervals} \
       --interval-padding 100 
 
   #finds the current sort order of this bam file
-  samtools view -H ${base_file_name}.recal.bam | grep @SQ | sed 's/@SQ\tSN:\|LN://g' > ${base_file_name}.sortOrder.txt
+  samtools view -H ~{base_file_name}.recal.bam | grep @SQ | sed 's/@SQ\tSN:\|LN://g' > ~{base_file_name}.sortOrder.txt
 
   }
   runtime {
@@ -336,9 +343,9 @@ task ApplyBaseRecalibrator {
 
   }
   output {
-    File recalibrated_bam = "${base_file_name}.recal.bam"
-    File recalibrated_bai = "${base_file_name}.recal.bai"
-    File sortOrder = "${base_file_name}.sortOrder.txt"
+    File recalibrated_bam = "~{base_file_name}.recal.bam"
+    File recalibrated_bai = "~{base_file_name}.recal.bai"
+    File sortOrder = "~{base_file_name}.sortOrder.txt"
   }
 }
 
@@ -360,10 +367,10 @@ task HaplotypeCaller {
   command {
     gatk --java-options "-Xmx4g" \
       HaplotypeCaller \
-      -R ${ref_fasta} \
-      -I ${input_bam} \
-      -O ${base_file_name}.GATK.vcf \
-      --intervals ${intervals} \
+      -R ~{ref_fasta} \
+      -I ~{input_bam} \
+      -O ~{base_file_name}.GATK.vcf \
+      --intervals ~{intervals} \
       --interval-padding 100 
     }
 
@@ -374,8 +381,8 @@ task HaplotypeCaller {
   }
 
   output {
-    File output_vcf = "${base_file_name}.GATK.vcf"
-    File output_vcf_index = "${base_file_name}.GATK.vcf.idx"
+    File output_vcf = "~{base_file_name}.GATK.vcf"
+    File output_vcf_index = "~{base_file_name}.GATK.vcf.idx"
   }
 }
 
@@ -394,14 +401,15 @@ task annovar {
   String base_vcf_name = basename(input_vcf, ".vcf")
   
   command {
-  tar -xzvf ${annovarTAR}
+  set -eo
+  tar -xzvf ~{annovarTAR}
   
-  perl annovar/table_annovar.pl ${input_vcf} annovar/humandb/ \
-    -buildver ${ref_name} \
-    -outfile ${base_vcf_name} \
+  perl annovar/table_annovar.pl ~{input_vcf} annovar/humandb/ \
+    -buildver ~{ref_name} \
+    -outfile ~{base_vcf_name} \
     -remove \
-    -protocol ${annovar_protocols} \
-    -operation ${annovar_operation} \
+    -protocol ~{annovar_protocols} \
+    -operation ~{annovar_operation} \
     -nastring . -vcfinput
   }
 
@@ -410,7 +418,7 @@ task annovar {
   }
 
   output {
-    File output_annotated_vcf = "${base_file_name}.GATK.${ref_name}_multianno.vcf"
-    File output_annotated_table = "${base_file_name}.GATK.${ref_name}_multianno.txt"
+    File output_annotated_vcf = "~{base_file_name}.GATK.~{ref_name}_multianno.vcf"
+    File output_annotated_table = "~{base_file_name}.GATK.~{ref_name}_multianno.txt"
   }
 }

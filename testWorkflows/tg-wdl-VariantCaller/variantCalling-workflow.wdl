@@ -1,3 +1,4 @@
+version 1.0
 ## Consensus variant calling workflow for human panel-based DNA sequencing.
 ## Input requirements:
 ## - Pair-end sequencing data in unmapped BAM (uBAM) format that comply with the following requirements:
@@ -12,10 +13,9 @@
 ## - Annovar annotated vcfs and tabular file
 ## 
 workflow Panel_BWA_GATK4_Annovar {
+  input {
   # Batch File import
   File batchFile
-  Array[Object] batchInfo = read_objects(batchFile)
-
   # Reference Data
   String ref_name
   File ref_fasta
@@ -45,7 +45,9 @@ workflow Panel_BWA_GATK4_Annovar {
   String samtoolsModule
   String perlModule
   String bwaModule
+  }
 
+  Array[Object] batchInfo = read_objects(batchFile)
 
 scatter (job in batchInfo){
   String sampleName = job.sampleName
@@ -161,24 +163,26 @@ scatter (job in batchInfo){
 
 # Prepare bed file and check sorting
 task SortBed {
+  input {
   File unsorted_bed
   File ref_dict
   String modules
+  }
   command {
     set -eo pipefail
 
     echo "Sort bed file"
-    sort -k1,1V -k2,2n -k3,3n ${unsorted_bed} > sorted.bed
+    sort -k1,1V -k2,2n -k3,3n ~{unsorted_bed} > sorted.bed
 
     echo "Transform bed file to intervals list with Picard----------------------------------------"
     gatk --java-options "-Xms4g" \
       BedToIntervalList \
       -I=sorted.bed \
       -O=sorted.interval_list \
-      -SD=${ref_dict}
+      -SD=~{ref_dict}
   }
   runtime {
-    modules: "${modules}"
+    modules: ~{modules}
   }
   output {
     File intervals = "sorted.interval_list"
@@ -187,33 +191,36 @@ task SortBed {
 }
 # Read unmapped BAM, convert to FASTQ
 task SamToFastq {
+  input {
   File input_bam
   String base_file_name
   String modules
+  }
 
   command {
     set -eo pipefail
 
     gatk --java-options "-Dsamjdk.compression_level=5 -Xms4g" \
       SamToFastq \
-			--INPUT=${input_bam} \
-			--FASTQ=${base_file_name}.fastq \
+			--INPUT=~{input_bam} \
+			--FASTQ=~{base_file_name}.fastq \
 			--INTERLEAVE=true \
 			--INCLUDE_NON_PF_READS=true 
   }
   runtime {
-    modules: "${modules}"
+    modules: ~{modules}
     memory: "6GB"
     cpu: 2
     partition: "campus"
   }
   output {
-    File output_fastq = "${base_file_name}.fastq"
+    File output_fastq = "~{base_file_name}.fastq"
   }
 }
 
 # align to genome
 task BwaMem {
+  input {
   File input_fastq
   String base_file_name
   File ref_fasta
@@ -226,29 +233,30 @@ task BwaMem {
   File ref_pac
   File ref_sa
   String modules
+  }
 
   command {
     set -eo pipefail
 
     bwa mem \
       -p -v 3 -t 16 -M \
-      ${ref_fasta} ${input_fastq} > ${base_file_name}.sam 
-    samtools view -1bS -@ 15 -o ${base_file_name}.aligned.bam ${base_file_name}.sam
+      ~{ref_fasta} ~{input_fastq} > ~{base_file_name}.sam 
+    samtools view -1bS -@ 15 -o ~{base_file_name}.aligned.bam ~{base_file_name}.sam
   }
   runtime {
-    modules: "${modules}"
+    modules: ~{modules}
     memory: "33GB"
     cpu: 16
-    partition: "largenode"
   }
   output {
-    File output_bam = "${base_file_name}.aligned.bam"
+    File output_bam = "~{base_file_name}.aligned.bam"
   }
 }
 
 
 # Merge original input uBAM file with BWA-aligned BAM file
 task MergeBamAlignment {
+  input {
   File unmapped_bam
   File aligned_bam
   String base_file_name
@@ -256,6 +264,7 @@ task MergeBamAlignment {
   File ref_fasta_index
   File ref_dict
   String modules
+  }
   command {
     set -eo pipefail
 
@@ -264,10 +273,10 @@ task MergeBamAlignment {
       --VALIDATION_STRINGENCY SILENT \
       --EXPECTED_ORIENTATIONS FR \
       --ATTRIBUTES_TO_RETAIN X0 \
-      --ALIGNED_BAM ${aligned_bam} \
-      --UNMAPPED_BAM ${unmapped_bam} \
-      --OUTPUT ${base_file_name}.merged.bam \
-      --REFERENCE_SEQUENCE ${ref_fasta} \
+      --ALIGNED_BAM ~{aligned_bam} \
+      --UNMAPPED_BAM ~{unmapped_bam} \
+      --OUTPUT ~{base_file_name}.merged.bam \
+      --REFERENCE_SEQUENCE ~{ref_fasta} \
       --PAIRED_RUN true \
       --SORT_ORDER coordinate \
       --IS_BISULFITE_SEQUENCE false \
@@ -282,18 +291,19 @@ task MergeBamAlignment {
       --CREATE_INDEX true
   }
   runtime {
-    modules: "${modules}"
+    modules: ~{modules}
     memory: "16GB"
     cpu: 4
   }
   output {
-    File output_bam = "${base_file_name}.merged.bam"
-    File output_bai = "${base_file_name}.merged.bai"
+    File output_bam = "~{base_file_name}.merged.bam"
+    File output_bai = "~{base_file_name}.merged.bai"
   }
 }
 
  #Generate Base Quality Score Recalibration (BQSR) model and apply it
 task ApplyBaseRecalibrator {
+  input {
   File input_bam
   File intervals 
   File input_bam_index
@@ -306,50 +316,52 @@ task ApplyBaseRecalibrator {
   File ref_fasta
   File ref_fasta_index
   String modules
+  }
   command {
   set -eo pipefail
 
-  samtools index ${input_bam}
+  samtools index ~{input_bam}
   
   gatk --java-options "-Xms4g" \
       BaseRecalibrator \
-      -R ${ref_fasta} \
-      -I ${input_bam} \
-      -O ${base_file_name}.recal_data.csv \
-      --known-sites ${dbSNP_vcf} \
-      --known-sites ${sep=" --known-sites " known_indels_sites_VCFs} \
-      --intervals ${intervals} \
+      -R ~{ref_fasta} \
+      -I ~{input_bam} \
+      -O ~{base_file_name}.recal_data.csv \
+      --known-sites ~{dbSNP_vcf} \
+      --known-sites ~{sep=" --known-sites " known_indels_sites_VCFs} \
+      --intervals ~{intervals} \
       --interval-padding 100 
 
   gatk --java-options "-Xms4g" \
       ApplyBQSR \
-      -bqsr ${base_file_name}.recal_data.csv \
-      -I ${input_bam} \
-      -O ${base_file_name}.recal.bam \
-      -R ${ref_fasta} \
-      --intervals ${intervals} \
+      -bqsr ~{base_file_name}.recal_data.csv \
+      -I ~{input_bam} \
+      -O ~{base_file_name}.recal.bam \
+      -R ~{ref_fasta} \
+      --intervals ~{intervals} \
       --interval-padding 100 
 
   #finds the current sort order of this bam file
-  samtools view -H ${base_file_name}.recal.bam | grep @SQ | sed 's/@SQ\tSN:\|LN://g' > ${base_file_name}.sortOrder.txt
+  samtools view -H ~{base_file_name}.recal.bam | grep @SQ | sed 's/@SQ\tSN:\|LN://g' > ~{base_file_name}.sortOrder.txt
 
   }
   runtime {
-    modules: "${modules}"
+    modules: ~{modules}
     memory: "33GB"
     cpu: 6
     partition: "largenode"
   }
   output {
-    File recalibrated_bam = "${base_file_name}.recal.bam"
-    File recalibrated_bai = "${base_file_name}.recal.bai"
-    File sortOrder = "${base_file_name}.sortOrder.txt"
+    File recalibrated_bam = "~{base_file_name}.recal.bam"
+    File recalibrated_bai = "~{base_file_name}.recal.bai"
+    File sortOrder = "~{base_file_name}.sortOrder.txt"
   }
 }
 
 
 # HaplotypeCaller per-sample
 task HaplotypeCaller {
+  input {
   File input_bam
   File input_bam_index
   String base_file_name
@@ -359,34 +371,36 @@ task HaplotypeCaller {
   File ref_fasta_index
   File dbSNP_vcf
   String modules
+  }
 
   command {
     set -eo pipefail
 
     gatk --java-options "-Xmx4g" \
       HaplotypeCaller \
-      -R ${ref_fasta} \
-      -I ${input_bam} \
-      -O ${base_file_name}.GATK.vcf \
-      --intervals ${intervals} \
+      -R ~{ref_fasta} \
+      -I ~{input_bam} \
+      -O ~{base_file_name}.GATK.vcf \
+      --intervals ~{intervals} \
       --interval-padding 100 
     }
 
   runtime {
-    modules: "${modules}"
+    modules: ~{modules}
     memory: "30GB"
     cpu: 4
   }
 
   output {
-    File output_vcf = "${base_file_name}.GATK.vcf"
-    File output_vcf_index = "${base_file_name}.GATK.vcf.idx"
+    File output_vcf = "~{base_file_name}.GATK.vcf"
+    File output_vcf_index = "~{base_file_name}.GATK.vcf.idx"
   }
 }
 
 
 # annotate with annovar
 task annovar {
+  input {
   File input_vcf
   String base_file_name
   String ref_name
@@ -395,25 +409,26 @@ task annovar {
   String annovarDIR
   String modules
   String base_vcf_name = basename(input_vcf, ".vcf")
+  }
   
   command {
   set -eo pipefail
   
-  perl ${annovarDIR}/annovar/table_annovar.pl ${input_vcf} ${annovarDIR}/annovar/humandb/ \
-    -buildver ${ref_name} \
-    -outfile ${base_vcf_name} \
+  perl ~{annovarDIR}/annovar/table_annovar.pl ~{input_vcf} ~{annovarDIR}/annovar/humandb/ \
+    -buildver ~{ref_name} \
+    -outfile ~{base_vcf_name} \
     -remove \
-    -protocol ${annovar_protocols} \
-    -operation ${annovar_operation} \
+    -protocol ~{annovar_protocols} \
+    -operation ~{annovar_operation} \
     -nastring . -vcfinput
   }
 
   runtime {
-    modules: "${modules}"
+    modules: ~{modules}
   }
 
   output {
-    File output_annotated_vcf = "${base_file_name}.GATK.${ref_name}_multianno.vcf"
-    File output_annotated_table = "${base_file_name}.GATK.${ref_name}_multianno.txt"
+    File output_annotated_vcf = "~{base_file_name}.GATK.~{ref_name}_multianno.vcf"
+    File output_annotated_table = "~{base_file_name}.GATK.~{ref_name}_multianno.txt"
   }
 }

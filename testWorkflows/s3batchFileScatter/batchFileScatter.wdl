@@ -1,3 +1,4 @@
+version 1.0
 # This workflow takes a tab separated file where each row is a set of data to be used in each 
 # of the independent scattered task series that you have as your workflow process.  This file 
 # will, for example, have column names `sampleName`, `bamLocation`, and `bedlocation`.  This
@@ -6,7 +7,9 @@
 
 ## This workflow allows the batch file (and other inputs) to be in AWS S3 storage. 
 workflow s3BatchFileScatter {
+  input {
   File s3batchFile
+  }
   Array[Object] batchInfo = read_objects(s3batchFile)
 scatter (job in batchInfo){
   # The variable `job` here is an object that contains the column names from the
@@ -32,13 +35,15 @@ scatter (job in batchInfo){
 #### TASK DEFINITIONS
 # echo some text to stdout, treats files as strings just to echo them as a dummy example
 task test {
+  input {
     String in1
     String in2
     String in3
+  }
     command {
-    echo ${in1}
-    echo ${in2}
-    echo ${in3}
+    echo ~{in1}
+    echo ~{in2}
+    echo ~{in3}
     }
     output {
         File item_out = stdout()

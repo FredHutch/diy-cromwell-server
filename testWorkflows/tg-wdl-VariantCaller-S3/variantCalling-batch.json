@@ -1,3 +1,0 @@
-{
-  "Panel_BWA_GATK4_Annovar.batchFile": "s3://fh-ctr-public-reference-data/workflow_testing_data/WDL/unpaired-panel-consensus-variants-human/batchOfTwo.tsv"
-  }
