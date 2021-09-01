@@ -1,5 +1,5 @@
 # diy-cromwell-server
-A repo containing instructions for running a Cromwell server on `gizmo` at the Fred Hutch.  These instructions were created and tested by Amy Paguirigan, so drop her a line if they don't work for you or you need help.  Username is `apaguiri`.  
+A repo containing instructions for running a Cromwell server on `gizmo` at the Fred Hutch.  These instructions were created and tested by Amy Paguirigan, so drop her a line if they don't work for you or you need help.  Fred Hutch username is `apaguiri`.  
 Alternatively, join the discussion in The Coop Slack in the [#question-and-answer channel](https://fhbig.slack.com/archives/CD3HGJHJT) using your Fred Hutch, UW, SCHARP or Sagebase email.  
 
 
@@ -17,7 +17,7 @@ Amy also made a shiny app you can use to monitor your own Cromwell server workfl
 If you have questions about these steps, feel free to contact Amy Paguirigan (`apaguiri`) or `scicomp`.  
 
 ### Rhino Access
-Currently, to run your own Cromwell server you'll need to know how to connect to `rhino` at the Fred Hutch.  While [I has a basic R package](https://github.com/FredHutch/fh.wdlR) for interacting with Cromwell via R, you may likely want to learn how to see what is happening via the `rhinos` so you'll want to read over at [SciWiki](https://sciwiki.fredhutch.org/) in the Scientific Computing section about Access Methods, and Technologies.  If you have never used the local cluster (`rhino`/`gizmo`), you may need to file a ticket by emailing fredhutch email `scicomp` and requesting your account be set up.  To do this you'll need to specify which PI you are sponsored by/work for.  
+Currently, to run your own Cromwell server you'll need to know how to connect to `rhino` at the Fred Hutch. If you have never used the local cluster (`rhino`/`gizmo`), you may need to file a ticket by emailing fredhutch email `scicomp` and requesting your account be set up.  To do this you'll need to specify which PI you are sponsored by/work for.  You also may want to read a bit more about the use of our cluster over at [SciWiki](https://sciwiki.fredhutch.org/) in the Scientific Computing section about Access Methods, and Technologies.  
 
 ### Database Setup
 These instructions let you stand up a Cromwell server for 7 days at a time.  If you have workflows that run longer than that or you want to be able to get metadata for or restart jobs even after the server goes down, you'll want an external database to keep track of your progress even if your server goes down (for whatever reason). It also will allow your future workflows to use cached copies of data when the exact task has already been done (and recorded in the database).  We have found as well that by using a MySQL database for your Cromwell server, it will run faster and be better able to handle simultaneous workflows while also making all the metadata available to you during and after the run.  
@@ -42,77 +42,60 @@ MariaDB [(none)]> exit
 
 ## Server setup instructions
 
-1.  Decide where you want to keep your Cromwell configuration files.  This must be a place where `rhino` can access them, such as in your `Home` directory, which is typically the default directory when you connect to the `rhinos`.  Create a `cromwell` folder (or whatever you want to call it) and save the files contained in this GitHub repo OR follow these git instructions to clone it directly.
+1.  Decide where you want to keep your Cromwell configuration files.  This must be a place where `rhino` can access them, such as in your `Home` directory, which is typically the default directory when you connect to the `rhinos`.  Create a `cromwell-home` folder (or whatever you want to call it) and follow these git instructions to clone it directly.
 
-### Quick git instructions on `rhino`
+
+2.  First set up the customizations per user that you're going to want for your server(s) by making user configuration file(s) in your `cromwell-home` or wherever you find convenient.  You can manage mulitple Cromwell profiles this way by just maintaining different files full of credentials and configuration variables that you want.  
+
+To get started, do the following on `rhino`:
 ```
-cd <to wherever you'd like to put all of your Cromwell stuff>
-
-git clone https://github.com/FredHutch/diy-cromwell-server.git
-
-# Makes a directory for your server logs and customization files
 mkdir -p cromwell-home
-mkdir -p ./cromwell-home/server-logs
+cd cromwell-home
+git clone --branch main https://github.com/FredHutch/diy-cromwell-server.git
 
-## Initially do this, but once you customize cromwellParams.sh, skip this step:
-cp ./diy-cromwell-server/cromwellParams.sh ./cromwell-home/
+
+cp ./diy-cromwell-server/cromUserConfig.txt .
+## When you are first setting up Cromwell, you'll need to put all of your User Customizations into this `cromUserConfig.txt` which can serve as a template.  
+## After you've done this once, you just need to keep the path to the file(s) handy for the future.  
 ```
 
-2.  Tailor your `cromwellParams.sh` file to be specific to your particular server (see notes in the version of the file in this repo).
-3.  Adjust, if desired, the memory and cpu resources requested for your server in `cromServer.sh`.  
+3.  Tailor your `cromUserConfig.txt` file to be specific to your various directories and resources (see notes in the version of the file in this repo).
 
 > Note:  For this server, you will want multiple cores to allow it to multi-task.  Memory is less important when you use an external database.  If you notice issues, the particular resource request for the server job itself might be a good place to start adjusting, in conjunction with some guidance from SciComp or the Slack [Question and Answer channel](https://fhbig.slack.com/archives/CD3HGJHJT) folks.
 
-5.  Kick off your Cromwell server by either:
-
-Connecting to `rhino` then (note:  change the port from `2020` here to whatever you'd like it to be, just remember it!):
+4.  Kick off your Cromwell server:
 ```
-cd <to wherever you'd like to put all of your Cromwell stuff>
+## You'll want to put `cromwell.sh` somewhere handy for future use, we suggest:
+cp ./diy-cromwell-server/cromwell.sh .
+chmod +x cromwell.sh
 
-sbatch -o \
-    ./cromwell-home/server-logs/cromwell-v52-%A.txt \
-    ./diy-cromwell-server/cromServer.sh \
-    ./cromwell-home/cromwellParams.sh \
-    2020 \
-    ./diy-cromwell-server/fullConfig/fh-cromwell.conf
-```
-If you'd like to use file inputs in AWS S3 and you have AWS credentials saved in your home directory, then do this:
-```
-cd <to wherever you'd like to put all of your Cromwell stuff>
-
-sbatch -o \
-    ./cromwell-home/server-logs/cromwell-v52-%A.txt \
-    ./diy-cromwell-server/cromServer.sh \
-    ./cromwell-home/cromwellParams.sh \
-    2020 \
-    ./diy-cromwell-server/fullConfig-withAWS/fh-S3-cromwell.conf
+# Then simply start up Cromwell:
+./cromwell.sh cromUserConfig.txt
 ```
 
-
-> Note:  the second line of these sbatch commands will save the output of the actual server job itself to `./cromwell-home/server-logs/` with the file name being `cromwell-v52-jobID.txt`.  This is not required but is helpful initially for you to troubleshoot if your server goes down and you don't know why.  The number on the fourth line is the port you want to use for the API - change it to whatever you'd like.  The last line is the path to the config file you downloaded.
-
-Or from your local R instance using the [fh.wdlR R package](https://github.com/FredHutch/fh.wdlR), using the correct path to the configuration file you'd like to use (either the fullConfig or fullConfig-withAWS):
-
-```{r}
-require(remotes)
-remotes::install_github('FredHutch/fh.wdlR')
-library(fh.wdlR)
-cromwellCreate(FredHutchId = "username", port = "2020",
-        pathToServerLogs = "/some/path/cromwell-home/server-logs/cromwell-v52-%A.txt",
-        pathToServerScript = "/some/path/cromwell-home/cromServer.sh",
-        pathToParams = "/some/path/cromwell-home/cromwellParams.sh",
-        pathToConfig = "/some/path/cromwell-home/fh-cromwell.conf")
-# You can use this to confirm that the environment variable was set correctly:
-Sys.getenv("CROMWELLURL")
+5.  Much like the `grabnode` command you may have used previously, the script will run and print back to the console instructions once the resources have been provisioned for the server. You should see something like this:
 ```
+Your configuration details have been found...
+Getting an updated copy of Crowmell configs from GitHub...
+Cloning into 'tg-cromwell-server'...
+remote: Enumerating objects: 196, done.
+remote: Counting objects: 100% (196/196), done.
+remote: Compressing objects: 100% (179/179), done.
+remote: Total 196 (delta 96), reused 109 (delta 13), pack-reused 0
+Receiving objects: 100% (196/196), 41.14 KiB | 533.00 KiB/s, done.
+Resolving deltas: 100% (96/96), done.
+Setting up all required directories...
+Requesting resources from SLURM for your server...
+Submitted batch job 36391382
+Your Cromwell server is attempting to start up on **node/port gizmok30:2020**.  If you encounter errors, you may want to check your server logs at /home/username/cromwell-home/server-logs to see if Cromwell was unable to start up.
+Go have fun now.
+```
+> NOTE:  Please write down the node and port it specifies here.  This is the only place where you will be able to find the particular node/port for this instance of your Cromwell server, and you'll need that to be able to send jobs to the Crowmell server.  If you forget it, `scancel` the Cromwell server job and start a new one.  
 
-If you use the R package, when you use the `cromwellCreate` function it will return the necessary information for using the API via a browser AND will automatically set your `CROMWELLURL` environment variable to the correct location for the remaining job submission and management functions in the R package.  Then you can skip step 6 and do not have to ever connect to `rhino` unless you want to.  
+6. For using the API (via a browser, some other method of submission), you'll want to keep the node and port number it tells you when you start up a fresh Cromwell server.  When you go your browser, you can go to (for example) `http://gizmok30:2020` ("2020" or whatever the webservice port it told you) to use the Swagger UI to submit workflows.  This node host and port also is what you use to submit and monitor workflows with the Shiny app at [cromwellapp.fredhutch.org](https://cromwellapp.fredhutch.org/) where it says "Current Cromwell host:port", you put `gizmok30:2020`.
 
 
-6. For using the API (via a browser, some other method of submission): On `rhino` type: `squeue -u username` to find the list of jobs you have running.  Note the node name (such as `gizmok30`) that your server job was assigned to.  When you go your browser, you can go to `http://gizmok30:2020` ("2020" or whatever the webservice port you chose) to use the Swagger UI to submit workflows.  This node host and port also is what you use to submit and monitor workflows with the Shiny app at [cromwellapp.fredhutch.org](https://cromwellapp.fredhutch.org/) where it says "Current Cromwell host:port", you put `gizmok30:2020`.
-
-
-7.  See our [Test Workflow folder](https://github.com/FredHutch/diy-cromwell-server/tree/master/testWorkflows) once your server is up and run through the tests specified in the markdown there.
+7.  See our [Test Workflow folder](https://github.com/FredHutch/diy-cromwell-server/tree/main/testWorkflows) once your server is up and run through the tests specified in the markdown there.
 
 ## Guidance and Support
 ### Monitoring your workflows at Fred Hutch:
@@ -122,37 +105,43 @@ I made a shiny app you can use to monitor your own Cromwell server workflows whe
 See our [SciWiki page](https://sciwiki.fredhutch.org/compdemos/Cromwell/) on Cromwell for more about guidance for how to start structuring and building your workflows as well as how to share them with others on campus in a findable way.  
 
 ### R support
-I have a basic R package that wraps the Cromwell API allowing you to submit, monitor and kill workflow jobs on `gizmo` from R directly. It also has a function (`cromwellCreate`) that can help you set up your Cromwell server directly from R assuming your configuration files are saved where `rhino` can reach them and you know their paths, the example for which is described above. This means that you don't necessarily have to interact with the command line to do workflow submissions again.  The package is [fh.wdlR](https://github.com/FredHutch/fh.wdlR).  
+I have a basic R package that wraps the Cromwell API allowing you to submit, monitor and kill workflow jobs on `gizmo` from R directly. The package is [fh.wdlR](https://github.com/FredHutch/fh.wdlR).  
 
 ### Other Fred Hutch based resources
-While additional development is going on to make Cromwell work better in AWS (currently it works well in Google and SLURM among other backends), we are anticipating that it will be more widely available for use with AWS based computing.  To support that there is a growing public data set AWS S3 bucket at `fh-ctr-public-reference-data`.  Contact Amy Paguirigan or Sam Minot if you'd like something to be added here and we can help you do that.  
+While additional development is going on to make Cromwell work better in AWS (currently it works well in Google and SLURM among other backends), we are anticipating that it will be more widely available for use with AWS based computing.  To support that there is a growing public data set AWS S3 bucket at `fh-ctr-public-reference-data`.  Contact Amy Paguirigan if you'd like something to be added here and we can help you do that.  
 
 ## Cromwell Server Customization
 
-In `cromwellParams.sh` there are some variables that allow users to share a similar configuration file but tailor the particular behavior of their Cromwell server to best suit them.  The following text is also in this repo but these are the customizations you'll need to decide on for your server.
+In `cromUserConfig.txt` there are some variables that allow users to share a similar configuration file but tailor the particular behavior of their Cromwell server to best suit them.  The following text is also in this repo but these are the customizations you'll need to decide on for your server.
 ```
 ################## WORKING DIRECTORY AND PATH CUSTOMIZATIONS ###################
 ## Where do you want the working directory to be for Cromwell (note: this process will create a subdirectory here called "cromwell-executions")?  
 ### Suggestion: /fh/scratch/delete90/pilastname_f/username/
-SCRATCHDIR=/fh/scratch/delete90/pilastname_f/username/
+SCRATCHDIR=/fh/scratch/delete90/...
 
 ## Where do you want logs about individual workflows (not jobs) to be written?
 ## Note: this is a default for the server and can be overwritten for a given workflow in workflow-options.
 ### Suggestion: /fh/fast/pilastname_f/cromwell/workflow-logs
-WORKFLOWLOGDIR=/fh/fast/pilastname_f/cromwell/workflow-logs
+WORKFLOWLOGDIR=~/cromwell-home/workflow-logs
 
 ## Where do you want final output files specified by workflows to be copied for your subsequent use?
 ## Note: this is a default for the server and can be overwritten for a given workflow in workflow-options.
 ### Suggestion: /fh/fast/pilastname_f/cromwell/outputs
-WORKFLOWOUTPUTSDIR=/fh/fast/pilastname_f/cromwell/outputs
+WORKFLOWOUTPUTSDIR=/fh/scratch/delete90/...
 
+## Where do you want to save Cromwell server logs for troubleshooting Cromwell itself?
+### Suggestion: ~/home/username/cromwell-home/server-logs
+SERVERLOGDIR=~./cromwell-home/server-logs
 
 ################ DATABASE CUSTOMIZATIONS #################
 ## DB4Sci MariaDB details (remove < and >, and use unquoted text):
-CROMWELLDBPORT=<DB PORT>
-CROMWELLDBNAME=<DB NAME>
-CROMWELLDBUSERNAME=<DB USER>
-CROMWELLDBPASSWORD=<DB PASSWORD>
+
+CROMWELLDBPORT=...
+CROMWELLDBNAME=...
+CROMWELLDBUSERNAME=...
+CROMWELLDBPASSWORD=...
+
+NCORES=4
 
 ```
 Whether these customizations are done user-by-user or lab-by-lab depend on how your group wants to interact with workflows and data.  Also, as there are additional features provided in the additional config's we provide, there may be additional customization parameters that you'll need.  Check the config directories to see if there are additional copies of those files and associated server shell scripts.  If they are absent that means you can use the base setup.  Contact Amy Paguirigan about these issues for some advice.  

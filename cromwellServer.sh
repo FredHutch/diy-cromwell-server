@@ -1,22 +1,28 @@
 #!/bin/bash
-#SBATCH --partition=campus-new
-#SBATCH --cpus-per-task=4
-#SBATCH --time="7-0"
-#SBATCH -N 1
-#SBATCH --job-name="cromwellServer"
-
-## This script needs three parameters;
-## The first is the path to the cromwellParams.sh file that contains your customizations
-## The second is the port you'd like to use for the API
-## The third is the path to the current config file you'd like to use
-
 source /app/lmod/lmod/init/bash
 module use /app/modules/all
+
+# grab all your customization variables for this env
+source ${2}
+
+# run this python chunk to find an open port on the node
+ml Python
+
+CROMWELLPORT=$( python3 <<CODE
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind(('', 0))
+addr = s.getsockname()
+print(addr[1])
+s.close()
+CODE
+)
+# send this port and hostname back to the user
+echo "Your Cromwell server is attempting to start up on node/port $(hostname):$CROMWELLPORT.  \
+If you encounter errors, you may want to check your server logs at "$SERVERLOGDIR" to see if Cromwell was unable to start up." | nc -N  ${SLURM_SUBMIT_HOST} ${MYPORT}
+
+# Clean the env
 module purge
-
-# Read in your custom config parameters
-source ${1}
-
 # Load the Cromwell Module
 module --ignore-cache load cromwell/57-Java-1.8
 
@@ -26,7 +32,6 @@ jdbc_options=(\
   rewriteBatchedStatements=true \
   serverTimezone=UTC \
 )
-
 # Then encode for URL (ampersands and all that)
 # see here: https://stackoverflow.com/questions/1527049/how-can-i-join-elements-of-an-array-in-bash
 jdbc_connect_params=$(IFS=\& ; echo "${jdbc_options[*]}")
@@ -44,12 +49,6 @@ fi
 if [ ! -d ${WORKFLOWLOGDIR} ]; then
   mkdir -p ${WORKFLOWLOGDIR}
 fi
-# Ensure workflow output dir exists
-if [ ! -d ${WORKFLOWOUTPUTSDIR} ]; then
-  mkdir -p ${WORKFLOWOUTPUTSDIR}
-fi
-
-## Singularity specific 
 # Ensure Singularity cache dir exists
 SINGULARITYCACHEDIR=${SCRATCHPATH}/.singularity-cache
 if [ ! -d ${SINGULARITYCACHEDIR} ]; then
@@ -60,18 +59,19 @@ export SINGULARITYCACHEDIR
 # Run your server!
 java -Xms28g -Xmx31g \
     -XX:+UseParallelGC \
-    -XX:ParallelGCThreads=4 \
-    -Dconfig.file=${3} \
+    -XX:ParallelGCThreads=${NCORES} \
+    -Dconfig.file=${1} \
     -DLOG_MODE=pretty \
     -DLOG_LEVEL=WARN \
     -Dbackend.providers.gizmo.config.root=${SCRATCHPATH} \
+    -Dbackend.providers.awsbatch.config.root=${AWSSCRATCH} \
+    -Dbackend.providers.awsbatch.config.default-runtime-attributes.scriptBucketName=${AWSBUCKETSCRIPTS} \
+    -Dbackend.providers.awsbatch.config.default-runtime-attributes.queueArn=${AWSQUEUEARN} \
     -Dworkflow-options.workflow-log-dir=${WORKFLOWLOGDIR} \
-    -Dworkflow-options.final_workflow_outputs_dir=${WORKFLOWOUTPUTSDIR} \
     -Ddatabase.db.url=jdbc:mysql://mydb:${CROMWELLDBPORT}/${CROMWELLDBNAME}?${jdbc_connect_params} \
     -Ddatabase.db.user=${CROMWELLDBUSERNAME} \
     -Ddatabase.db.password=${CROMWELLDBPASSWORD} \
-    -Dwebservice.port=${2} \
+    -Dwebservice.port=${CROMWELLPORT} \
     -jar $EBROOTCROMWELL/cromwell-57.jar \
     server
-
 
