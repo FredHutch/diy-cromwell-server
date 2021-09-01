@@ -64,9 +64,6 @@ java -Xms28g -Xmx31g \
     -DLOG_MODE=pretty \
     -DLOG_LEVEL=WARN \
     -Dbackend.providers.gizmo.config.root=${SCRATCHPATH} \
-    -Dbackend.providers.awsbatch.config.root=${AWSSCRATCH} \
-    -Dbackend.providers.awsbatch.config.default-runtime-attributes.scriptBucketName=${AWSBUCKETSCRIPTS} \
-    -Dbackend.providers.awsbatch.config.default-runtime-attributes.queueArn=${AWSQUEUEARN} \
     -Dworkflow-options.workflow-log-dir=${WORKFLOWLOGDIR} \
     -Ddatabase.db.url=jdbc:mysql://mydb:${CROMWELLDBPORT}/${CROMWELLDBNAME}?${jdbc_connect_params} \
     -Ddatabase.db.user=${CROMWELLDBUSERNAME} \
