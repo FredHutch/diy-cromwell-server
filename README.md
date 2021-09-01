@@ -98,7 +98,8 @@ Go have fun now.
 6. For using the API (via a browser, some other method of submission), you'll want to keep the node and port number it tells you when you start up a fresh Cromwell server.  When you go your browser, you can go to (for example) `http://gizmok30:2020` ("2020" or whatever the webservice port it told you) to use the Swagger UI to submit workflows.  This node host and port also is what you use to submit and monitor workflows with the Shiny app at [cromwellapp.fredhutch.org](https://cromwellapp.fredhutch.org/) where it says "Current Cromwell host:port", you put `gizmok30:2020`.
 
 
-7.  See our [Test Workflow folder](https://github.com/FredHutch/diy-cromwell-server/tree/main/testWorkflows) once your server is up and run through the tests specified in the markdown there.
+7.  See our [Test Workflow folder](https://github.com/FredHutch/diy-cromwell-server/tree/main/testWorkflows) once your server is up and run through the tests specified in the markdown there. 
+> NOTE: For those test workflows that use Docker containers, know that the first time you run them, you may notice that jobs aren't being sent very quickly.  That is because for our cluster, we need to convert those Docker containers to something that can be run by Singularity.  The first time a Docker container is used, it must be converted, but in the future Cromwell will used the cached version of the Docker container and jobs will be submitted more quickly. 
 
 ## Guidance and Support
 ### Monitoring your workflows at Fred Hutch:
