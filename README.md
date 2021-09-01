@@ -19,6 +19,9 @@ If you have questions about these steps, feel free to contact Amy Paguirigan (`a
 ### Rhino Access
 Currently, to run your own Cromwell server you'll need to know how to connect to `rhino` at the Fred Hutch. If you have never used the local cluster (`rhino`/`gizmo`), you may need to file a ticket by emailing fredhutch email `scicomp` and requesting your account be set up.  To do this you'll need to specify which PI you are sponsored by/work for.  You also may want to read a bit more about the use of our cluster over at [SciWiki](https://sciwiki.fredhutch.org/) in the Scientific Computing section about Access Methods, and Technologies.  
 
+### AWS S3 Access
+This setup requires that you have a set of AWS credentials for access to an AWS S3 bucket, and specifically to the S3 bucket(s) from which you pull workflow inputs.  Refer to [SciWiki](https://sciwiki.fredhutch.org/scicomputing/compute_cloud/#get-aws-credentials) or email `scicomp` to request credentials. 
+
 ### Database Setup
 These instructions let you stand up a Cromwell server for 7 days at a time.  If you have workflows that run longer than that or you want to be able to get metadata for or restart jobs even after the server goes down, you'll want an external database to keep track of your progress even if your server goes down (for whatever reason). It also will allow your future workflows to use cached copies of data when the exact task has already been done (and recorded in the database).  We have found as well that by using a MySQL database for your Cromwell server, it will run faster and be better able to handle simultaneous workflows while also making all the metadata available to you during and after the run.  
 
