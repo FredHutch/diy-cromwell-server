@@ -13,7 +13,7 @@ echo "Your configuration details have been found..."
 echo "Getting an updated copy of Crowmell configs from GitHub..."
 # If the repo already exists, delete it then re-clone a fresh copy
 if [ -d "diy-cromwell-server" ]; then rm -Rf diy-cromwell-server; fi
-git clone --branch automagic ssh://git@github.com/FredHutch/diy-cromwell-server.git
+git clone --branch main ssh://git@github.com/FredHutch/diy-cromwell-server.git
 
 echo "Setting up all required directories..."
 # If the directory to write server logs to doesn't yet exist, make it.
