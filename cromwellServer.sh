@@ -24,7 +24,7 @@ If you encounter errors, you may want to check your server logs at "$SERVERLOGDI
 # Clean the env
 module purge
 # Load the Cromwell Module
-module --ignore-cache load cromwell/57-Java-1.8
+module --ignore-cache load cromwell/67
 
 # All this to make it a little more readable.  Put JDBC connection
 # options in a bash array
@@ -69,6 +69,6 @@ java -Xms28g -Xmx31g \
     -Ddatabase.db.user=${CROMWELLDBUSERNAME} \
     -Ddatabase.db.password=${CROMWELLDBPASSWORD} \
     -Dwebservice.port=${CROMWELLPORT} \
-    -jar $EBROOTCROMWELL/cromwell-57.jar \
+    -jar $EBROOTCROMWELL/cromwell-67.jar \
     server
 
