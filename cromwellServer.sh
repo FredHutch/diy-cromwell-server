@@ -69,6 +69,6 @@ java -Xms28g -Xmx31g \
     -Ddatabase.db.user=${CROMWELLDBUSERNAME} \
     -Ddatabase.db.password=${CROMWELLDBPASSWORD} \
     -Dwebservice.port=${CROMWELLPORT} \
-    -jar $EBROOTCROMWELL/cromwell-57.jar \
+    -jar $EBROOTCROMWELL/cromwell-67.jar \
     server
 
