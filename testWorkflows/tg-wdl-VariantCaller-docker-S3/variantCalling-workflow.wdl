@@ -310,7 +310,7 @@ task ApplyBaseRecalibrator {
   String docker
   }
   command {
-    set -3o
+  set -eo
   samtools index ~{input_bam}
   
   gatk --java-options "-Xms4g" \
@@ -365,6 +365,7 @@ task HaplotypeCaller {
   }
 
   command {
+    set -eo
     gatk --java-options "-Xmx4g" \
       HaplotypeCaller \
       -R ~{ref_fasta} \
