@@ -25,4 +25,10 @@ CROMWELLDBNAME=...
 CROMWELLDBUSERNAME=...
 CROMWELLDBPASSWORD=...
 
+## Number of cores for your Cromwell server itself - usually 4 is sufficient.  
+###Increase if you want to run many, complex workflows simlutaneously or notice your server is slowing down.
 NCORES=4
+## Length of time you want the server to run for.  
+### Note: when servers go down, all jobs they'd sent will continue.  When you start up a server the next time
+### using the same database, the new server will pick up whereever the previous workflows left off.  "7-0" is 7 days, zero hours.
+SERVERTIME="7-0" 

@@ -4,7 +4,7 @@ if [ ! -f ${1} ]; then
   exit
 fi
 source ${1}
-if [[ -z $NCORES || -z $SCRATCHDIR || -z $WORKFLOWLOGDIR || -z $WORKFLOWOUTPUTSDIR || -z $SERVERLOGDIR || -z $CROMWELLDBPORT || -z $CROMWELLDBNAME || -z $CROMWELLDBUSERNAME || -z $CROMWELLDBPASSWORD ]]; then 
+if [[ -z $NCORES || -z $SCRATCHDIR || -z $WORKFLOWLOGDIR || -z $WORKFLOWOUTPUTSDIR || -z $SERVERLOGDIR || -z $CROMWELLDBPORT || -z $CROMWELLDBNAME || -z $CROMWELLDBUSERNAME || -z $CROMWELLDBPASSWORD || -z $SERVERTIME ]]; then 
     echo "One or more of your personal configuration variables is unset, please check your configuration file and try again."
     exit 1
 fi
@@ -23,7 +23,7 @@ fi
 
 echo "Requesting resources from SLURM for your server..."
 # Submit the server job, and tell it to send netcat info back to port 6000
-sbatch --export=MYPORT=6000 --cpus-per-task=$NCORES -N 1 --time="7-0" --job-name="cromwellServer" \
+sbatch --export=MYPORT=6000 --cpus-per-task=$NCORES -N 1 --time=$SERVERTIME --job-name="cromwellServer" \
   --output=$SERVERLOGDIR/cromwell_%A.out\
   ./diy-cromwell-server/cromwellServer.sh ./diy-cromwell-server/fh-S3-cromwell.conf \
   ${1}
