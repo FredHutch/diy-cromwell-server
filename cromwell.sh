@@ -4,11 +4,15 @@ if [ ! -f ${1} ]; then
   exit
 fi
 source ${1}
-if [[ -z $NCORES || -z $SCRATCHDIR || -z $WORKFLOWLOGDIR || -z $WORKFLOWOUTPUTSDIR || -z $SERVERLOGDIR || -z $CROMWELLDBPORT || -z $CROMWELLDBNAME || -z $CROMWELLDBUSERNAME || -z $CROMWELLDBPASSWORD || -z $SERVERTIME ]]; then 
+if [[ -z $NCORES || -z $SCRATCHDIR || -z $WORKFLOWLOGDIR || -z $WORKFLOWOUTPUTSDIR || -z $SERVERLOGDIR || -z $CROMWELLDBPORT || -z $CROMWELLDBNAME || -z $CROMWELLDBUSERNAME || -z $CROMWELLDBPASSWORD ]]; then 
     echo "One or more of your personal configuration variables is unset, please check your configuration file and try again."
     exit 1
 fi
 echo "Your configuration details have been found..."
+# Setting default servertime if not specified
+if [[ -z $SERVERTIME ]]; then 
+  SERVERTIME="7-0"
+fi
 
 echo "Getting an updated copy of Cromwell configs from GitHub..."
 # If the repo already exists, delete it then re-clone a fresh copy
