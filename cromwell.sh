@@ -17,7 +17,7 @@ fi
 echo "Getting an updated copy of Cromwell configs from GitHub..."
 # If the repo already exists, delete it then re-clone a fresh copy
 if [ -d "diy-cromwell-server" ]; then rm -Rf diy-cromwell-server; fi
-git clone --branch v1.0 https://github.com/FredHutch/diy-cromwell-server.git
+git clone --branch v1.1 https://github.com/FredHutch/diy-cromwell-server.git
 
 echo "Setting up all required directories..."
 # If the directory to write server logs to doesn't yet exist, make it.
