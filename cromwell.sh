@@ -9,6 +9,10 @@ if [[ -z $NCORES || -z $SCRATCHDIR || -z $WORKFLOWLOGDIR || -z $WORKFLOWOUTPUTSD
     exit 1
 fi
 echo "Your configuration details have been found..."
+# Setting default servertime if not specified
+if [[ -z $SERVERTIME ]]; then 
+  SERVERTIME="7-0"
+fi
 
 echo "Getting an updated copy of Cromwell configs from GitHub..."
 # If the repo already exists, delete it then re-clone a fresh copy
@@ -23,7 +27,7 @@ fi
 
 echo "Requesting resources from SLURM for your server..."
 # Submit the server job, and tell it to send netcat info back to port 6000
-sbatch --export=MYPORT=6000 --cpus-per-task=$NCORES -N 1 --time="7-0" --job-name="cromwellServer" \
+sbatch --export=MYPORT=6000 --cpus-per-task=$NCORES -N 1 --time=$SERVERTIME --job-name="cromwellServer" \
   --output=$SERVERLOGDIR/cromwell_%A.out\
   ./diy-cromwell-server/cromwellServer.sh ./diy-cromwell-server/fh-S3-cromwell.conf \
   ${1}
