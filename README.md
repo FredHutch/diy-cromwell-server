@@ -67,6 +67,7 @@ cp ./diy-cromwell-server/cromUserConfig.txt .
 > Note:  For this server, you will want multiple cores to allow it to multi-task.  Memory is less important when you use an external database.  If you notice issues, the particular resource request for the server job itself might be a good place to start adjusting, in conjunction with some guidance from SciComp or the Slack [Question and Answer channel](https://fhbig.slack.com/archives/CD3HGJHJT) folks.
 
 4.  Kick off your Cromwell server:
+> Note:  for version 1.2 and later, this script, `cromwell.sh` includes the version name in it, such as `cromwellv1.2.sh`.
 ```
 ## You'll want to put `cromwell.sh` somewhere handy for future use, we suggest:
 cp ./diy-cromwell-server/cromwell.sh .
