@@ -69,12 +69,12 @@ cp ./diy-cromwell-server/cromUserConfig.txt .
 4.  Kick off your Cromwell server:
 > Note:  for version 1.2 and later, this script, `cromwell.sh` includes the version name in it, such as `cromwellv1.2.sh`.
 ```
-## You'll want to put `cromwell.sh` somewhere handy for future use, we suggest:
-cp ./diy-cromwell-server/cromwell.sh .
-chmod +x cromwell.sh
+## You'll want to put `cromwellv1.2.sh` somewhere handy for future use, we suggest:
+cp ./diy-cromwell-server/cromwellv1.2.sh .
+chmod +x cromwellv1.2.sh
 
 # Then simply start up Cromwell:
-./cromwell.sh cromUserConfig.txt
+./cromwellv1.2.sh cromUserConfig.txt
 ```
 
 5.  Much like the `grabnode` command you may have used previously, the script will run and print back to the console instructions once the resources have been provisioned for the server. You should see something like this:
