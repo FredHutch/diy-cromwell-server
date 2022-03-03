@@ -1,6 +1,5 @@
 # diy-cromwell-server
-A repo containing instructions for running a Cromwell server on `gizmo` at the Fred Hutch.  These instructions were created and tested by Amy Paguirigan, so drop her a line if they don't work for you or you need help.  Fred Hutch username is `apaguiri`.  
-Alternatively, join the discussion in The Coop Slack in the [#question-and-answer channel](https://fhbig.slack.com/archives/CD3HGJHJT) using your Fred Hutch, UW, SCHARP or Sagebase email.  
+A repo containing instructions for running a Cromwell server on `gizmo` at the Fred Hutch.  These instructions were created and tested by Amy Paguirigan, so drop her a line if they don't work for you or you need help (Fred Hutch username is `apaguiri`) or you can tag @vortexing in Issues filed here in the GitHub repository.  Note if you do this, please be sure that you do not post sensitive information in your troubleshooting information like passwords and such, but the more info you can provide about errors, the better.  Alternatively, join the discussion in the Fred Hutch Bioinformatics and Computational Research Community Slack in the [#question-and-answer channel](https://fhbig.slack.com/archives/CD3HGJHJT) using your Fred Hutch, UW, SCHARP or Sagebase email.  
 
 
 ## Cromwell Resources
