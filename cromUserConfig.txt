@@ -8,10 +8,6 @@ SCRATCHDIR=/fh/scratch/delete90/...
 ### Suggestion: /fh/fast/pilastname_f/cromwell/workflow-logs
 WORKFLOWLOGDIR=~/cromwell-home/workflow-logs
 
-## Where do you want final output files specified by workflows to be copied for your subsequent use?
-## Note: this is a default for the server and can be overwritten for a given workflow in workflow-options.
-### Suggestion: /fh/fast/pilastname_f/cromwell/outputs
-WORKFLOWOUTPUTSDIR=/fh/scratch/delete90/...
 
 ## Where do you want to save Cromwell server logs for troubleshooting Cromwell itself?
 ### Suggestion: ~/home/username/cromwell-home/server-logs
@@ -26,7 +22,7 @@ CROMWELLDBUSERNAME=...
 CROMWELLDBPASSWORD=...
 
 ## Number of cores for your Cromwell server itself - usually 4 is sufficient.  
-###Increase if you want to run many, complex workflows simlutaneously or notice your server is slowing down.
+###Increase if you want to run many, complex workflows simultaneously or notice your server is slowing down.
 NCORES=4
 ## Length of time you want the server to run for.  
 ### Note: when servers go down, all jobs they'd sent will continue.  When you start up a server the next time
