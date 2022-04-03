@@ -70,12 +70,12 @@ cp ./diy-cromwell-server/cromUserConfig.txt .
 4.  Kick off your Cromwell server:
 > Note:  for version 1.2 and later, this script, `cromwell.sh` includes the version name in it, such as `cromwellv1.2.sh`.
 ```
-## You'll want to put `cromwellv1.2.sh` somewhere handy for future use, we suggest:
-cp ./diy-cromwell-server/cromwellv1.2.sh .
-chmod +x cromwellv1.2.sh
+## You'll want to put `cromwellv1.3.sh` somewhere handy for future use, we suggest:
+cp ./diy-cromwell-server/cromwellv1.3.sh .
+chmod +x cromwellv1.3.sh
 
 # Then simply start up Cromwell:
-./cromwellv1.2.sh cromUserConfig.txt
+./cromwellv1.3.sh cromUserConfig.txt
 ```
 
 5.  Much like the `grabnode` command you may have used previously, the script will run and print back to the console instructions once the resources have been provisioned for the server. You should see something like this:
@@ -93,7 +93,7 @@ Go have fun now.
 > NOTE:  Please write down the node and port it specifies here.  This is the only place where you will be able to find the particular node/port for this instance of your Cromwell server, and you'll need that to be able to send jobs to the Crowmell server.  If you forget it, `scancel` the Cromwell server job and start a new one.  
 
 
-6. This node host and port is what you use to submit and monitor workflows with the Shiny app at [cromwellapp.fredhutch.org](https://cromwellapp.fredhutch.org/).  After you click the "Connect to Server" button, you'll put `gizmok30:2020` (or whatever your node:port is) where it says "Current Cromwell host:port".
+6. This node host and port is what you use to submit and monitor workflows with the Shiny app at [cromwellapp.fredhutch.org](https://cromwellapp.fredhutch.org/).  After you click the "Connect to Server" button, you'll put `gizmok30:20201` (or whatever your node:port is) where it says "Current Cromwell host:port".
 
 7.  While your server will normally stop after 7 days (the default), at which point if you have jobs still running you can simply restart your server and it will reconnect to existing jobs/workflows.  However, if you need to take down your server for whatever reason before that point, you can go to `rhino` and do:
 
