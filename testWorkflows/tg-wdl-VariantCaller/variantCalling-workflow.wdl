@@ -182,7 +182,7 @@ task SortBed {
       -SD=~{ref_dict}
   }
   runtime {
-    modules: ~{modules}
+    modules: modules
   }
   output {
     File intervals = "sorted.interval_list"
@@ -208,7 +208,7 @@ task SamToFastq {
 			--INCLUDE_NON_PF_READS=true 
   }
   runtime {
-    modules: ~{modules}
+    modules: module
     memory: "6GB"
     cpu: 2
     partition: "campus"
@@ -244,7 +244,7 @@ task BwaMem {
     samtools view -1bS -@ 15 -o ~{base_file_name}.aligned.bam ~{base_file_name}.sam
   }
   runtime {
-    modules: ~{modules}
+    modules: module
     memory: "33GB"
     cpu: 16
   }
@@ -291,7 +291,7 @@ task MergeBamAlignment {
       --CREATE_INDEX true
   }
   runtime {
-    modules: ~{modules}
+    modules: module
     memory: "16GB"
     cpu: 4
   }
@@ -346,7 +346,7 @@ task ApplyBaseRecalibrator {
 
   }
   runtime {
-    modules: ~{modules}
+    modules: module
     memory: "33GB"
     cpu: 6
     partition: "largenode"
@@ -386,7 +386,7 @@ task HaplotypeCaller {
     }
 
   runtime {
-    modules: ~{modules}
+    modules: module
     memory: "30GB"
     cpu: 4
   }
@@ -424,7 +424,7 @@ task annovar {
   }
 
   runtime {
-    modules: ~{modules}
+    modules: module
   }
 
   output {
