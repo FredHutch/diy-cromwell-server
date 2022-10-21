@@ -12,11 +12,16 @@ version 1.0
 ## - GATK vcf
 ## - Annovar annotated vcfs and tabular file
 ## 
-workflow Panel_BWA_GATK4_Annovar {
-  input {
-  # Batch File import
-  File batchFile
-  # Reference Data
+
+# struct for the input files for a given sample
+struct sampleInputs {
+  String sample_name
+  File bamFile
+  File bedFile
+}
+
+# struct for all the reference data needed for the run
+struct referenceData {
   String ref_name
   File ref_fasta
   File ref_fasta_index
@@ -34,44 +39,49 @@ workflow Panel_BWA_GATK4_Annovar {
   File dbSNP_vcf_index
   Array[File] known_indels_sites_VCFs
   Array[File] known_indels_sites_indices
-
-  # Annovar specific variables
-  File annovarDIR
+  String annovarDIR
   String annovar_protocols
   String annovar_operation
+}
 
-  # Gizmo Easybuild Modules
-  String GATKModule
-  String samtoolsModule
-  String perlModule
-  String bwaModule
+
+workflow Panel_BWA_GATK4_Annovar {
+  input {
+  # Batch File import
+  Array[sampleInputs] sampleBatch
+  # Reference Data
+  referenceData referenceGenome
+
+  # Gizmo Easybuild Modules this has been tested with
+  String GATKModule = "GATK/4.1.0.0-foss-2018b-Python-3.6.6"
+  String samtoolsModule = "SAMtools/1.16.1-GCC-11.2.0"
+  String perlModule = "Perl/5.28.0-GCCcore-7.3.0"
+  String bwaModule = "BWA/0.7.17-GCCcore-11.2.0"
   }
 
-  Array[Object] batchInfo = read_objects(batchFile)
 
-scatter (job in batchInfo){
-  String sampleName = job.sampleName
-  File bamLocation = job.bamLocation
-  File bedLocation = job.bedLocation
+scatter (sample in sampleBatch){
+
+  File bam = sample.bamFile
+  File bed = sample.bedFile
 
   # Get the basename, i.e. strip the filepath and the extension
-  String bam_basename = basename(bamLocation, ".unmapped.bam")
-  String base_file_name = sampleName + "." + ref_name
+  String base_file_name = sample.sample_name + "." + referenceGenome.ref_name
 
 
   # Prepare bed file and check sorting
   call SortBed {
     input:
-      unsorted_bed = bedLocation,
-      ref_dict = ref_dict,
-      modules = GATKModule
+      unsorted_bed = bed,
+      ref_dict = referenceGenome.ref_dict,
+      taskModules = GATKModule
   }
   # convert unmapped bam to fastq
   call SamToFastq {
     input:
-      input_bam = bamLocation,
+      input_bam = bam,
       base_file_name = base_file_name,
-      modules = GATKModule
+      taskModules = GATKModule
   }
 
 #  Map reads to reference
@@ -79,28 +89,29 @@ scatter (job in batchInfo){
     input:
       input_fastq = SamToFastq.output_fastq,
       base_file_name = base_file_name,
-      ref_fasta = ref_fasta,
-      ref_fasta_index = ref_fasta_index,
-      ref_dict = ref_dict,
-      ref_alt = ref_alt,
-      ref_amb = ref_amb,
-      ref_ann = ref_ann,
-      ref_bwt = ref_bwt,
-      ref_pac = ref_pac,
-      ref_sa = ref_sa,
-      modules = bwaModule + " " + samtoolsModule
+      ref_fasta = referenceGenome.ref_fasta,
+      ref_fasta_index = referenceGenome.ref_fasta_index,
+      ref_dict = referenceGenome.ref_dict,
+      ref_alt = referenceGenome.ref_alt,
+      ref_amb = referenceGenome.ref_amb,
+      ref_ann = referenceGenome.ref_ann,
+      ref_bwt = referenceGenome.ref_bwt,
+      ref_pac = referenceGenome.ref_pac,
+      ref_sa = referenceGenome.ref_sa,
+      cpuNeeded = 4,
+      taskModules = bwaModule + " " + samtoolsModule
   }
 
   # Merge original uBAM and BWA-aligned BAM
   call MergeBamAlignment {
     input:
-      unmapped_bam = bamLocation,
+      unmapped_bam = bam,
       aligned_bam = BwaMem.output_bam,
       base_file_name = base_file_name,
-      ref_fasta = ref_fasta,
-      ref_fasta_index = ref_fasta_index,
-      ref_dict = ref_dict,
-      modules = GATKModule
+      ref_fasta = referenceGenome.ref_fasta,
+      ref_fasta_index = referenceGenome.ref_fasta_index,
+      ref_dict = referenceGenome.ref_dict,
+      taskModules = GATKModule
   }
 
   # Generate the recalibration model by interval
@@ -110,14 +121,14 @@ scatter (job in batchInfo){
       input_bam_index = MergeBamAlignment.output_bai,
       base_file_name = base_file_name,
       intervals = SortBed.intervals,
-      dbSNP_vcf = dbSNP_vcf,
-      dbSNP_vcf_index = dbSNP_vcf_index,
-      known_indels_sites_VCFs = known_indels_sites_VCFs,
-      known_indels_sites_indices = known_indels_sites_indices,
-      ref_dict = ref_dict,
-      ref_fasta = ref_fasta,
-      ref_fasta_index = ref_fasta_index,
-      modules = GATKModule + " " + samtoolsModule
+      dbSNP_vcf = referenceGenome.dbSNP_vcf,
+      dbSNP_vcf_index = referenceGenome.dbSNP_vcf_index,
+      known_indels_sites_VCFs = referenceGenome.known_indels_sites_VCFs,
+      known_indels_sites_indices = referenceGenome.known_indels_sites_indices,
+      ref_dict = referenceGenome.ref_dict,
+      ref_fasta = referenceGenome.ref_fasta,
+      ref_fasta_index = referenceGenome.ref_fasta_index,
+      taskModules = GATKModule + " " + samtoolsModule
     }
 
     # Generate haplotype caller vcf
@@ -127,23 +138,23 @@ scatter (job in batchInfo){
         input_bam_index = ApplyBaseRecalibrator.recalibrated_bai,
         intervals = SortBed.intervals,
         base_file_name = base_file_name,
-        ref_dict = ref_dict,
-        ref_fasta = ref_fasta,
-        ref_fasta_index = ref_fasta_index,
-        dbSNP_vcf = dbSNP_vcf,
-        modules = GATKModule
+        ref_dict = referenceGenome.ref_dict,
+        ref_fasta = referenceGenome.ref_fasta,
+        ref_fasta_index = referenceGenome.ref_fasta_index,
+        dbSNP_vcf = referenceGenome.dbSNP_vcf,
+        taskModules = GATKModule
     }
 
     # Annotate variants
     call annovar {
       input:
         input_vcf = HaplotypeCaller.output_vcf,
-        ref_name = ref_name,
+        ref_name = referenceGenome.ref_name,
         base_file_name = base_file_name,
-        annovar_operation = annovar_operation,
-        annovar_protocols = annovar_protocols,
-        annovarDIR = annovarDIR,
-        modules = perlModule
+        annovar_operation = referenceGenome.annovar_operation,
+        annovar_protocols = referenceGenome.annovar_protocols,
+        annovarDIR = referenceGenome.annovarDIR,
+        taskModules = perlModule
     }
 
   # End scatter 
@@ -166,7 +177,7 @@ task SortBed {
   input {
   File unsorted_bed
   File ref_dict
-  String modules
+  String taskModules
   }
   command {
     set -eo pipefail
@@ -182,7 +193,7 @@ task SortBed {
       -SD=~{ref_dict}
   }
   runtime {
-    modules: ~{modules}
+    modules: taskModules
   }
   output {
     File intervals = "sorted.interval_list"
@@ -192,9 +203,9 @@ task SortBed {
 # Read unmapped BAM, convert to FASTQ
 task SamToFastq {
   input {
-  File input_bam
-  String base_file_name
-  String modules
+    File input_bam
+    String base_file_name
+    String taskModules
   }
 
   command {
@@ -202,16 +213,13 @@ task SamToFastq {
 
     gatk --java-options "-Dsamjdk.compression_level=5 -Xms4g" \
       SamToFastq \
-			--INPUT=~{input_bam} \
-			--FASTQ=~{base_file_name}.fastq \
-			--INTERLEAVE=true \
-			--INCLUDE_NON_PF_READS=true 
+      --INPUT=~{input_bam} \
+      --FASTQ=~{base_file_name}.fastq \
+      --INTERLEAVE=true \
+      --INCLUDE_NON_PF_READS=true 
   }
   runtime {
-    modules: ~{modules}
-    memory: "6GB"
-    cpu: 2
-    partition: "campus"
+    modules: taskModules
   }
   output {
     File output_fastq = "~{base_file_name}.fastq"
@@ -232,21 +240,22 @@ task BwaMem {
   File ref_bwt
   File ref_pac
   File ref_sa
-  String modules
+  Int cpuNeeded
+  String taskModules
   }
 
   command {
     set -eo pipefail
 
     bwa mem \
-      -p -v 3 -t 16 -M \
+      -p -v 3 -t ~{cpuNeeded} -M \
       ~{ref_fasta} ~{input_fastq} > ~{base_file_name}.sam 
-    samtools view -1bS -@ 15 -o ~{base_file_name}.aligned.bam ~{base_file_name}.sam
+    samtools view -1bS -@ ~{cpuNeeded - 1} -o ~{base_file_name}.aligned.bam ~{base_file_name}.sam
   }
   runtime {
-    modules: ~{modules}
+    modules: taskModules
     memory: "33GB"
-    cpu: 16
+    cpu: cpuNeeded
   }
   output {
     File output_bam = "~{base_file_name}.aligned.bam"
@@ -263,7 +272,7 @@ task MergeBamAlignment {
   File ref_fasta
   File ref_fasta_index
   File ref_dict
-  String modules
+  String taskModules
   }
   command {
     set -eo pipefail
@@ -291,9 +300,7 @@ task MergeBamAlignment {
       --CREATE_INDEX true
   }
   runtime {
-    modules: ~{modules}
-    memory: "16GB"
-    cpu: 4
+    modules: taskModules
   }
   output {
     File output_bam = "~{base_file_name}.merged.bam"
@@ -315,7 +322,7 @@ task ApplyBaseRecalibrator {
   File ref_dict
   File ref_fasta
   File ref_fasta_index
-  String modules
+  String taskModules
   }
   command {
   set -eo pipefail
@@ -346,10 +353,8 @@ task ApplyBaseRecalibrator {
 
   }
   runtime {
-    modules: ~{modules}
-    memory: "33GB"
-    cpu: 6
-    partition: "largenode"
+    modules: taskModules
+
   }
   output {
     File recalibrated_bam = "~{base_file_name}.recal.bam"
@@ -370,7 +375,7 @@ task HaplotypeCaller {
   File ref_fasta
   File ref_fasta_index
   File dbSNP_vcf
-  String modules
+  String taskModules
   }
 
   command {
@@ -386,9 +391,7 @@ task HaplotypeCaller {
     }
 
   runtime {
-    modules: ~{modules}
-    memory: "30GB"
-    cpu: 4
+    modules: taskModules
   }
 
   output {
@@ -407,7 +410,7 @@ task annovar {
   String annovar_protocols
   String annovar_operation
   String annovarDIR
-  String modules
+  String taskModules
   String base_vcf_name = basename(input_vcf, ".vcf")
   }
   
@@ -424,7 +427,7 @@ task annovar {
   }
 
   runtime {
-    modules: ~{modules}
+    modules: taskModules
   }
 
   output {
