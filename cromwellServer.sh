@@ -19,6 +19,7 @@ CODE
 )
 # send this port and hostname back to the user
 echo "Your Cromwell server is attempting to start up on node/port $(hostname):$CROMWELLPORT.  \
+It can take up to 2 minutes prior to the port being open for use by the shiny app at https://cromwellapp.fredhutch.org or via the R package fh.wdlR. \
 If you encounter errors, you may want to check your server logs at "$SERVERLOGDIR" to see if Cromwell was unable to start up." | nc -N  ${SLURM_SUBMIT_HOST} ${MYPORT}
 
 # Clean the env

@@ -1,15 +1,15 @@
 # diy-cromwell-server
-A repo containing instructions for running a Cromwell server on `gizmo` at the Fred Hutch.  These instructions were created and tested by Amy Paguirigan, so drop her a line if they don't work for you or you need help (Fred Hutch username is `apaguiri`) or you can tag @vortexing in Issues filed here in the GitHub repository.  Note if you do this, please be sure that you do not post sensitive information in your troubleshooting information like passwords and such, but the more info you can provide about errors, the better.  Alternatively, join the discussion in the Fred Hutch Bioinformatics and Computational Research Community Slack in the [#question-and-answer channel](https://fhbig.slack.com/archives/CD3HGJHJT) using your Fred Hutch, UW, SCHARP or Sagebase email.  
+A repo containing instructions for running a Cromwell server on `gizmo` at the Fred Hutch.  These instructions were created and tested by Amy Paguirigan, so drop her a line if they don't work for you or you need help (Fred Hutch username is `apaguiri`) or you can tag @vortexing in Issues filed here in the GitHub repository.  Note if you file an issue, please be sure that you do not post sensitive information in your troubleshooting information like passwords and such, but the more info you can provide about errors, the better.  Alternatively, join the discussion in the Fred Hutch Data Community Slack in the [#workflow-managers](https://fhdata.slack.com/archives/CJFP1NYSZ) channel using your Fred Hutch, UW, SCHARP or Sagebase email.  
 
 
 ## Cromwell Resources
-Cromwell is a workflow manager developed by the Broad which manages the individual tasks involved in multi-step workflows, tracks job metadata, provides an API/Swagger UI interface and allows users to manage multiple workflows simultaneously.  Cromwell currently uses either CWL or WDL workflow languages, and we will focus on WDL workflows for now. [Learn more on the Fred Hutch wiki about using Cromwell at Fred Hutch.](https://sciwiki.fredhutch.org/compdemos/Cromwell/)
+Cromwell is a workflow manager developed by the Broad which manages the individual tasks involved in multi-step workflows, tracks job metadata, provides an API/Swagger UI interface and allows users to manage multiple workflows simultaneously.  Cromwell currently runs workflows written in WDL workflow language.  [Learn more on the Fred Hutch wiki about using Cromwell at Fred Hutch.](https://sciwiki.fredhutch.org/compdemos/Cromwell/)  The WDL specification and documentation is curated by the [openWDL group](https://openwdl.org/).
 
-You can see what is currently available in the FredHutch GitHub institution by using [this link to search results](https://github.com/FredHutch?utf8=%E2%9C%93&q=wdl+OR+cromwell&type=&language=).
-
-We have also been building other places to find information about both workflow managers being supported at the Fred Hutch via [this GitHub Project](https://github.com/orgs/FredHutch/projects/8).
+You can see what is currently available publicly in the FredHutch GitHub institution by using [this link to search results](https://github.com/FredHutch?utf8=%E2%9C%93&q=wdl+OR+cromwell&type=&language=).
 
 Amy also made a shiny app you can use to monitor your own Cromwell server workflows when you have a Cromwell server running on `gizmo` that can be found [here](https://cromwellapp.fredhutch.org/).
+
+Amy has a basic R package that wraps the Cromwell API allowing you to submit, monitor and kill workflow jobs on `gizmo` from R directly. The package is [fh.wdlR](https://github.com/FredHutch/fh.wdlR).  
 
 
 ## Steps to prepare
@@ -19,7 +19,7 @@ If you have questions about these steps, feel free to contact Amy Paguirigan (`a
 Currently, to run your own Cromwell server you'll need to know how to connect to `rhino` at the Fred Hutch. If you have never used the local cluster (`rhino`/`gizmo`), you may need to file a ticket by emailing fredhutch email `scicomp` and requesting your account be set up.  To do this you'll need to specify which PI you are sponsored by/work for.  You also may want to read a bit more about the use of our cluster over at [SciWiki](https://sciwiki.fredhutch.org/) in the Scientific Computing section about Access Methods, and Technologies.  
 
 ### AWS S3 Access (optional as of version 1.3)
-Prior to release 1.3, this setup required that you have a set of AWS credentials for access to an AWS S3 bucket, and specifically to the S3 bucket(s) from which you pull workflow inputs.  Refer to [SciWiki](https://sciwiki.fredhutch.org/scicomputing/compute_cloud/#get-aws-credentials) or email `scicomp` to request credentials. 
+Regardless of whether you are wanting to operate on data storaed in AWS S3  Refer to [SciWiki](https://sciwiki.fredhutch.org/scicomputing/compute_cloud/#get-aws-credentials) or email `scicomp` to request credentials. 
 
 As of version 1.3 if you have credentials, then the Cromwell server will be configured to allow input files to directly specified using their AWS S3 url.  However if you do not have AWS credentials, then the server will now successfully start up, simply without the ability to localize files from S3, thus all test workflows that use files in S3 will not work for you, but everything else should.
 
@@ -70,12 +70,12 @@ cp ./diy-cromwell-server/cromUserConfig.txt .
 4.  Kick off your Cromwell server:
 > Note:  for version 1.2 and later, this script, `cromwell.sh` includes the version name in it, such as `cromwellv1.2.sh`.
 ```
-## You'll want to put `cromwellv1.3.sh` somewhere handy for future use, we suggest:
-cp ./diy-cromwell-server/cromwellv1.3.sh .
-chmod +x cromwellv1.3.sh
+## You'll want to put `cromwell.sh` somewhere handy for future use, we suggest:
+cp ./diy-cromwell-server/cromwell.sh .
+chmod +x cromwell.sh
 
 # Then simply start up Cromwell:
-./cromwellv1.3.sh cromUserConfig.txt
+./cromwell.sh cromUserConfig.txt
 ```
 
 5.  Much like the `grabnode` command you may have used previously, the script will run and print back to the console instructions once the resources have been provisioned for the server. You should see something like this:
@@ -119,11 +119,7 @@ I made a shiny app you can use to monitor your own Cromwell server workflows whe
 ### Design Recommendations for WDL workflows at Fred Hutch
 See our [SciWiki page](https://sciwiki.fredhutch.org/compdemos/Cromwell/) on Cromwell for more about guidance for how to start structuring and building your workflows as well as how to share them with others on campus in a findable way.  
 
-### R support
-I have a basic R package that wraps the Cromwell API allowing you to submit, monitor and kill workflow jobs on `gizmo` from R directly. The package is [fh.wdlR](https://github.com/FredHutch/fh.wdlR).  
 
-### Other Fred Hutch based resources
-While additional development is going on to make Cromwell work better in AWS (currently it works well in Google and SLURM among other backends), we are anticipating that it will be more widely available for use with AWS based computing.  To support that there is a growing public data set AWS S3 bucket at `fh-ctr-public-reference-data`.  Contact Amy Paguirigan if you'd like something to be added here and we can help you do that.  
 
 ## Cromwell Server Customization
 
