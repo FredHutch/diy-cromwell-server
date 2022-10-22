@@ -19,12 +19,13 @@ CODE
 )
 # send this port and hostname back to the user
 echo "Your Cromwell server is attempting to start up on node/port $(hostname):$CROMWELLPORT.  \
+It can take up to 2 minutes prior to the port being open for use by the shiny app at https://cromwellapp.fredhutch.org or via the R package fh.wdlR. \
 If you encounter errors, you may want to check your server logs at "$SERVERLOGDIR" to see if Cromwell was unable to start up." | nc -N  ${SLURM_SUBMIT_HOST} ${MYPORT}
 
 # Clean the env
 module purge
 # Load the Cromwell Module
-module --ignore-cache load cromwell/73
+module --ignore-cache load cromwell/84
 
 # All this to make it a little more readable.  Put JDBC connection
 # options in a bash array
@@ -69,6 +70,6 @@ java -Xms28g -Xmx31g \
     -Ddatabase.db.user=${CROMWELLDBUSERNAME} \
     -Ddatabase.db.password=${CROMWELLDBPASSWORD} \
     -Dwebservice.port=${CROMWELLPORT} \
-    -jar $EBROOTCROMWELL/cromwell-73.jar \
+    -jar $EBROOTCROMWELL/cromwell.jar \
     server
 
