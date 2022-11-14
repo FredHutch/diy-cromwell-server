@@ -11,7 +11,7 @@ WORKFLOWLOGDIR=~/cromwell-home/workflow-logs
 
 ## Where do you want to save Cromwell server logs for troubleshooting Cromwell itself?
 ### Suggestion: ~/home/username/cromwell-home/server-logs
-SERVERLOGDIR=~./cromwell-home/server-logs
+SERVERLOGDIR=~/cromwell-home/server-logs
 
 ################ DATABASE CUSTOMIZATIONS #################
 ## DB4Sci MariaDB details (remove < and >, and use unquoted text, and no spaces after the = sign):
