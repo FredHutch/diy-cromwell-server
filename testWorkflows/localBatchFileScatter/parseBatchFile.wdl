@@ -6,9 +6,9 @@ version 1.0
 # inputs will be used for the tasks you define.  
 workflow parseBatchFile {
   input {
-  File batchFile
+    File batchFile
   }
-    Array[Object] batchInfo = read_objects(batchFile)
+  Array[Object] batchInfo = read_objects(batchFile)
   scatter (job in batchInfo){
     String sampleName = job.sampleName
     File bamFile = job.bamLocation
@@ -20,11 +20,11 @@ workflow parseBatchFile {
     }
 
   }  # End Scatter over the batch file
-# Outputs that will be retained when execution is complete
+  # Outputs that will be retained when execution is complete
   output {
     Array[File] outputArray = test.item_out
-    }
-# End workflow
+  }
+  # End workflow
 }
 
 #### TASK DEFINITIONS
@@ -35,12 +35,12 @@ task test {
     String in2
     String in3
   }
-    command {
+  command {
     echo ~{in1}
     echo ~{in2}
     echo ~{in3}
-    }
-    output {
-        File item_out = stdout()
-    }
+  }
+  output {
+    File item_out = stdout()
+  }
 }

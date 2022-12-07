@@ -47,88 +47,86 @@ struct referenceData {
 
 workflow Panel_BWA_GATK4_Annovar {
   input {
-  # Batch File import
-  Array[sampleInputs] sampleBatch
-  # Reference Data
-  referenceData referenceGenome
+    # Batch File import
+    Array[sampleInputs] sampleBatch
+    # Reference Data
+    referenceData referenceGenome
 
-  # Gizmo Easybuild Modules this has been tested with
-  String GATKModule = "GATK/4.1.0.0-foss-2018b-Python-3.6.6"
-  String samtoolsModule = "SAMtools/1.16.1-GCC-11.2.0"
-  String perlModule = "Perl/5.28.0-GCCcore-7.3.0"
-  String bwaModule = "BWA/0.7.17-GCCcore-11.2.0"
+    # Gizmo Easybuild Modules this has been tested with
+    String GATKModule = "GATK/4.1.0.0-foss-2018b-Python-3.6.6"
+    String samtoolsModule = "SAMtools/1.16.1-GCC-11.2.0"
+    String perlModule = "Perl/5.28.0-GCCcore-7.3.0"
+    String bwaModule = "BWA/0.7.17-GCCcore-11.2.0"
   }
 
+  scatter (sample in sampleBatch){
 
-scatter (sample in sampleBatch){
+    File bam = sample.bamFile
+    File bed = sample.bedFile
 
-  File bam = sample.bamFile
-  File bed = sample.bedFile
+    # Get the basename, i.e. strip the filepath and the extension
+    String base_file_name = sample.sample_name + "." + referenceGenome.ref_name
 
-  # Get the basename, i.e. strip the filepath and the extension
-  String base_file_name = sample.sample_name + "." + referenceGenome.ref_name
+    # Prepare bed file and check sorting
+    call SortBed {
+      input:
+        unsorted_bed = bed,
+        ref_dict = referenceGenome.ref_dict,
+        taskModules = GATKModule
+    }
+    # convert unmapped bam to fastq
+    call SamToFastq {
+      input:
+        input_bam = bam,
+        base_file_name = base_file_name,
+        taskModules = GATKModule
+    }
 
+    #  Map reads to reference
+    call BwaMem {
+      input:
+        input_fastq = SamToFastq.output_fastq,
+        base_file_name = base_file_name,
+        ref_fasta = referenceGenome.ref_fasta,
+        ref_fasta_index = referenceGenome.ref_fasta_index,
+        ref_dict = referenceGenome.ref_dict,
+        ref_alt = referenceGenome.ref_alt,
+        ref_amb = referenceGenome.ref_amb,
+        ref_ann = referenceGenome.ref_ann,
+        ref_bwt = referenceGenome.ref_bwt,
+        ref_pac = referenceGenome.ref_pac,
+        ref_sa = referenceGenome.ref_sa,
+        cpuNeeded = 4,
+        taskModules = bwaModule + " " + samtoolsModule
+    }
 
-  # Prepare bed file and check sorting
-  call SortBed {
-    input:
-      unsorted_bed = bed,
-      ref_dict = referenceGenome.ref_dict,
-      taskModules = GATKModule
-  }
-  # convert unmapped bam to fastq
-  call SamToFastq {
-    input:
-      input_bam = bam,
-      base_file_name = base_file_name,
-      taskModules = GATKModule
-  }
+    # Merge original uBAM and BWA-aligned BAM
+    call MergeBamAlignment {
+      input:
+        unmapped_bam = bam,
+        aligned_bam = BwaMem.output_bam,
+        base_file_name = base_file_name,
+        ref_fasta = referenceGenome.ref_fasta,
+        ref_fasta_index = referenceGenome.ref_fasta_index,
+        ref_dict = referenceGenome.ref_dict,
+        taskModules = GATKModule
+    }
 
-#  Map reads to reference
-  call BwaMem {
-    input:
-      input_fastq = SamToFastq.output_fastq,
-      base_file_name = base_file_name,
-      ref_fasta = referenceGenome.ref_fasta,
-      ref_fasta_index = referenceGenome.ref_fasta_index,
-      ref_dict = referenceGenome.ref_dict,
-      ref_alt = referenceGenome.ref_alt,
-      ref_amb = referenceGenome.ref_amb,
-      ref_ann = referenceGenome.ref_ann,
-      ref_bwt = referenceGenome.ref_bwt,
-      ref_pac = referenceGenome.ref_pac,
-      ref_sa = referenceGenome.ref_sa,
-      cpuNeeded = 4,
-      taskModules = bwaModule + " " + samtoolsModule
-  }
-
-  # Merge original uBAM and BWA-aligned BAM
-  call MergeBamAlignment {
-    input:
-      unmapped_bam = bam,
-      aligned_bam = BwaMem.output_bam,
-      base_file_name = base_file_name,
-      ref_fasta = referenceGenome.ref_fasta,
-      ref_fasta_index = referenceGenome.ref_fasta_index,
-      ref_dict = referenceGenome.ref_dict,
-      taskModules = GATKModule
-  }
-
-  # Generate the recalibration model by interval
-  call ApplyBaseRecalibrator {
-    input:
-      input_bam = MergeBamAlignment.output_bam,
-      input_bam_index = MergeBamAlignment.output_bai,
-      base_file_name = base_file_name,
-      intervals = SortBed.intervals,
-      dbSNP_vcf = referenceGenome.dbSNP_vcf,
-      dbSNP_vcf_index = referenceGenome.dbSNP_vcf_index,
-      known_indels_sites_VCFs = referenceGenome.known_indels_sites_VCFs,
-      known_indels_sites_indices = referenceGenome.known_indels_sites_indices,
-      ref_dict = referenceGenome.ref_dict,
-      ref_fasta = referenceGenome.ref_fasta,
-      ref_fasta_index = referenceGenome.ref_fasta_index,
-      taskModules = GATKModule + " " + samtoolsModule
+    # Generate the recalibration model by interval
+    call ApplyBaseRecalibrator {
+      input:
+        input_bam = MergeBamAlignment.output_bam,
+        input_bam_index = MergeBamAlignment.output_bai,
+        base_file_name = base_file_name,
+        intervals = SortBed.intervals,
+        dbSNP_vcf = referenceGenome.dbSNP_vcf,
+        dbSNP_vcf_index = referenceGenome.dbSNP_vcf_index,
+        known_indels_sites_VCFs = referenceGenome.known_indels_sites_VCFs,
+        known_indels_sites_indices = referenceGenome.known_indels_sites_indices,
+        ref_dict = referenceGenome.ref_dict,
+        ref_fasta = referenceGenome.ref_fasta,
+        ref_fasta_index = referenceGenome.ref_fasta_index,
+        taskModules = GATKModule + " " + samtoolsModule
     }
 
     # Generate haplotype caller vcf
@@ -175,9 +173,9 @@ scatter (sample in sampleBatch){
 # Prepare bed file and check sorting
 task SortBed {
   input {
-  File unsorted_bed
-  File ref_dict
-  String taskModules
+    File unsorted_bed
+    File ref_dict
+    String taskModules
   }
   command {
     set -eo pipefail
@@ -200,6 +198,7 @@ task SortBed {
     File sorted_bed = "sorted.bed"
   }
 }
+
 # Read unmapped BAM, convert to FASTQ
 task SamToFastq {
   input {
@@ -229,19 +228,19 @@ task SamToFastq {
 # align to genome
 task BwaMem {
   input {
-  File input_fastq
-  String base_file_name
-  File ref_fasta
-  File ref_fasta_index
-  File ref_dict
-  File? ref_alt
-  File ref_amb
-  File ref_ann
-  File ref_bwt
-  File ref_pac
-  File ref_sa
-  Int cpuNeeded
-  String taskModules
+    File input_fastq
+    String base_file_name
+    File ref_fasta
+    File ref_fasta_index
+    File ref_dict
+    File? ref_alt
+    File ref_amb
+    File ref_ann
+    File ref_bwt
+    File ref_pac
+    File ref_sa
+    Int cpuNeeded
+    String taskModules
   }
 
   command {
@@ -266,13 +265,13 @@ task BwaMem {
 # Merge original input uBAM file with BWA-aligned BAM file
 task MergeBamAlignment {
   input {
-  File unmapped_bam
-  File aligned_bam
-  String base_file_name
-  File ref_fasta
-  File ref_fasta_index
-  File ref_dict
-  String taskModules
+    File unmapped_bam
+    File aligned_bam
+    String base_file_name
+    File ref_fasta
+    File ref_fasta_index
+    File ref_dict
+    String taskModules
   }
   command {
     set -eo pipefail
@@ -311,50 +310,49 @@ task MergeBamAlignment {
  #Generate Base Quality Score Recalibration (BQSR) model and apply it
 task ApplyBaseRecalibrator {
   input {
-  File input_bam
-  File intervals 
-  File input_bam_index
-  String base_file_name
-  File dbSNP_vcf
-  File dbSNP_vcf_index
-  Array[File] known_indels_sites_VCFs
-  Array[File] known_indels_sites_indices
-  File ref_dict
-  File ref_fasta
-  File ref_fasta_index
-  String taskModules
+    File input_bam
+    File intervals 
+    File input_bam_index
+    String base_file_name
+    File dbSNP_vcf
+    File dbSNP_vcf_index
+    Array[File] known_indels_sites_VCFs
+    Array[File] known_indels_sites_indices
+    File ref_dict
+    File ref_fasta
+    File ref_fasta_index
+    String taskModules
   }
   command {
-  set -eo pipefail
+    set -eo pipefail
 
-  samtools index ~{input_bam}
-  
-  gatk --java-options "-Xms4g" \
-      BaseRecalibrator \
-      -R ~{ref_fasta} \
-      -I ~{input_bam} \
-      -O ~{base_file_name}.recal_data.csv \
-      --known-sites ~{dbSNP_vcf} \
-      --known-sites ~{sep=" --known-sites " known_indels_sites_VCFs} \
-      --intervals ~{intervals} \
-      --interval-padding 100 
+    samtools index ~{input_bam}
+    
+    gatk --java-options "-Xms4g" \
+        BaseRecalibrator \
+        -R ~{ref_fasta} \
+        -I ~{input_bam} \
+        -O ~{base_file_name}.recal_data.csv \
+        --known-sites ~{dbSNP_vcf} \
+        --known-sites ~{sep=" --known-sites " known_indels_sites_VCFs} \
+        --intervals ~{intervals} \
+        --interval-padding 100 
 
-  gatk --java-options "-Xms4g" \
-      ApplyBQSR \
-      -bqsr ~{base_file_name}.recal_data.csv \
-      -I ~{input_bam} \
-      -O ~{base_file_name}.recal.bam \
-      -R ~{ref_fasta} \
-      --intervals ~{intervals} \
-      --interval-padding 100 
+    gatk --java-options "-Xms4g" \
+        ApplyBQSR \
+        -bqsr ~{base_file_name}.recal_data.csv \
+        -I ~{input_bam} \
+        -O ~{base_file_name}.recal.bam \
+        -R ~{ref_fasta} \
+        --intervals ~{intervals} \
+        --interval-padding 100 
 
-  #finds the current sort order of this bam file
-  samtools view -H ~{base_file_name}.recal.bam | grep @SQ | sed 's/@SQ\tSN:\|LN://g' > ~{base_file_name}.sortOrder.txt
+    #finds the current sort order of this bam file
+    samtools view -H ~{base_file_name}.recal.bam | grep @SQ | sed 's/@SQ\tSN:\|LN://g' > ~{base_file_name}.sortOrder.txt
 
   }
   runtime {
     modules: taskModules
-
   }
   output {
     File recalibrated_bam = "~{base_file_name}.recal.bam"
@@ -367,15 +365,15 @@ task ApplyBaseRecalibrator {
 # HaplotypeCaller per-sample
 task HaplotypeCaller {
   input {
-  File input_bam
-  File input_bam_index
-  String base_file_name
-  File intervals
-  File ref_dict
-  File ref_fasta
-  File ref_fasta_index
-  File dbSNP_vcf
-  String taskModules
+    File input_bam
+    File input_bam_index
+    String base_file_name
+    File intervals
+    File ref_dict
+    File ref_fasta
+    File ref_fasta_index
+    File dbSNP_vcf
+    String taskModules
   }
 
   command {
@@ -388,7 +386,7 @@ task HaplotypeCaller {
       -O ~{base_file_name}.GATK.vcf \
       --intervals ~{intervals} \
       --interval-padding 100 
-    }
+  }
 
   runtime {
     modules: taskModules
@@ -404,26 +402,29 @@ task HaplotypeCaller {
 # annotate with annovar
 task annovar {
   input {
-  File input_vcf
-  String base_file_name
-  String ref_name
-  String annovar_protocols
-  String annovar_operation
-  String annovarDIR
-  String taskModules
-  String base_vcf_name = basename(input_vcf, ".vcf")
+    File input_vcf
+    String base_file_name
+    String ref_name
+    String annovar_protocols
+    String annovar_operation
+    String annovarDIR
+    String taskModules
+    String base_vcf_name = basename(input_vcf, ".vcf")
   }
   
   command {
-  set -eo pipefail
-  
-  perl ~{annovarDIR}/annovar/table_annovar.pl ~{input_vcf} ~{annovarDIR}/annovar/humandb/ \
-    -buildver ~{ref_name} \
-    -outfile ~{base_vcf_name} \
-    -remove \
-    -protocol ~{annovar_protocols} \
-    -operation ~{annovar_operation} \
-    -nastring . -vcfinput
+    set -eo pipefail
+    
+    ## needed for some users' environments
+    # unset PERL5LIB
+
+    perl ~{annovarDIR}/annovar/table_annovar.pl ~{input_vcf} ~{annovarDIR}/annovar/humandb/ \
+      -buildver ~{ref_name} \
+      -outfile ~{base_vcf_name} \
+      -remove \
+      -protocol ~{annovar_protocols} \
+      -operation ~{annovar_operation} \
+      -nastring . -vcfinput
   }
 
   runtime {
