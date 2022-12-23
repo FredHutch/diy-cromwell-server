@@ -1,3 +1,0 @@
-sampleName	bamLocation	bedLocation
-smallTestData	/fh/fast/paguirigan_a/pub/ReferenceDataSets/workflow_testing_data/WDL/unpaired-panel-consensus-variants-human/smallTestData.unmapped.bam	/fh/fast/paguirigan_a/pub/ReferenceDataSets/reagent_specific_data/sequencing_panel_bed/TruSight-Myeloid-Illumina/trusight-myeloid-amplicon-v4-track_interval-liftOver-hg38.bed
-smallTestData-reference	/fh/fast/paguirigan_a/pub/ReferenceDataSets/workflow_testing_data/WDL/paired-panel-consensus-variants-human/smallTestData-reference.unmapped.bam	/fh/fast/paguirigan_a/pub/ReferenceDataSets/reagent_specific_data/sequencing_panel_bed/TruSight-Myeloid-Illumina/trusight-myeloid-amplicon-v4-track_interval-liftOver-hg38.bed
