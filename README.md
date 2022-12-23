@@ -1,5 +1,5 @@
 # diy-cromwell-server
-A repo containing instructions for running a Cromwell server on `gizmo` at the Fred Hutch.  These instructions were created and tested by Amy Paguirigan, so drop her a line if they don't work for you or you need help (Fred Hutch username is `apaguiri`) or you can tag @vortexing in Issues filed here in the GitHub repository.  Note if you file an issue, please be sure that you do not post sensitive information in your troubleshooting information like passwords and such, but the more info you can provide about errors, the better.  Alternatively, join the discussion in the Fred Hutch Data Community Slack in the [#workflow-managers](https://fhdata.slack.com/archives/CJFP1NYSZ) channel using your Fred Hutch, UW, SCHARP or Sagebase email.  
+A repo containing instructions for running a Cromwell server on `gizmo` at the Fred Hutch.  These instructions were created and tested by Amy Paguirigan, so drop her a line if they don't work for you or you need help (Fred Hutch username is `apaguiri`) or you can tag @vortexing in Issues filed here in the GitHub repository.  Note if you file an issue, please be sure that you do not post sensitive information in your troubleshooting information like passwords and such, but the more info you can provide about errors, the better.  Alternatively, join the discussion in the Fred Hutch Data Community Slack in the [#workflow-managers](https://fhdata.slack.com/archives/CJFP1NYSZ) channel using your Fred Hutch, UW, SCHARP or Sagebase email.    Also you may want to check out our [example workflow repo for basic, testing workflows](https://github.com/FredHutch/wdl-test-workflows).
 
 
 ## Cromwell Resources
@@ -109,7 +109,7 @@ scancel 50062886
 
 ```
 
-8.  See our [Test Workflow folder](https://github.com/FredHutch/diy-cromwell-server/tree/main/testWorkflows) once your server is up and run through the tests specified in the markdown there. 
+8.  See our [Test Workflow repo](https://github.com/FredHutch/wdl-test-workflows) once your server is up and run through the tests specified in the markdowns there. 
 > NOTE: For those test workflows that use Docker containers, know that the first time you run them, you may notice that jobs aren't being sent very quickly.  That is because for our cluster, we need to convert those Docker containers to something that can be run by Singularity.  The first time a Docker container is used, it must be converted, but in the future Cromwell will used the cached version of the Docker container and jobs will be submitted more quickly. 
 
 
