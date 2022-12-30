@@ -25,7 +25,7 @@ If you encounter errors, you may want to check your server logs at "$SERVERLOGDI
 # Clean the env
 module purge
 # Load the Cromwell Module
-module --ignore-cache load cromwell/84
+module --ignore-cache load cromwell/83.1-AWS
 
 # All this to make it a little more readable.  Put JDBC connection
 # options in a bash array
