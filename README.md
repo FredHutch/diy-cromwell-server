@@ -9,7 +9,7 @@ You can see what is currently available publicly in the FredHutch GitHub institu
 
 Amy also made a shiny app you can use to monitor your own Cromwell server workflows when you have a Cromwell server running on `gizmo` that can be found [here](https://cromwellapp.fredhutch.org/).
 
-Amy has a basic R package that wraps the Cromwell API allowing you to submit, monitor and kill workflow jobs on `gizmo` from R directly. The package is [fh.wdlR](https://github.com/FredHutch/fh.wdlR).  
+Amy has a basic R package that wraps the Cromwell API allowing you to submit, monitor and kill workflow jobs on `gizmo` from R directly. The package is [rcromwell](https://github.com/getwilds/rcromwell).
 
 
 ## Steps to prepare
@@ -87,13 +87,13 @@ Detecting existence of AWS credentials...
 Credentials found, setting appropriate configuration...
 Requesting resources from SLURM for your server...
 Submitted batch job 2224761
-Your Cromwell server is attempting to start up on node/port gizmok53:46287.  It can take up to 2 minutes prior to the port being open for use by the shiny app at https://cromwellapp.fredhutch.org or via the R package fh.wdlR. If you encounter errors, you may want to check your server logs at /home/username/cromwell-home/server-logs to see if Cromwell was unable to start up.
+Your Cromwell server is attempting to start up at http://gizmok53:46287.  It can take up to 2 minutes prior to the port being open for use by the shiny app at https://cromwellapp.fredhutch.org or via the R package rcromwell. If you encounter errors, you may want to check your server logs at /home/username/cromwell-home/server-logs to see if Cromwell was unable to start up.
 Go have fun now.
 ```
-> NOTE:  Please write down the node and port it specifies here.  This is the only place where you will be able to find the particular node/port for this instance of your Cromwell server, and you'll need that to be able to send jobs to the Crowmell server.  If you forget it, `scancel` the Cromwell server job and start a new one.  
+> NOTE:  Please write down the url it specifies here.  This is the only place where you will be able to find the particular url for this instance of your Cromwell server, and you'll need that to be able to send jobs to the Crowmell server.  If you forget it, `scancel` the Cromwell server job and start a new one.
 
 
-6. This node host and port is what you use to submit and monitor workflows with the Shiny app at [cromwellapp.fredhutch.org](https://cromwellapp.fredhutch.org/).  After you click the "Connect to Server" button, you'll put `gizmok30:20201` (or whatever your node:port is) where it says "Current Cromwell host:port".
+6. This url is what you use to submit and monitor workflows with the Shiny app at [cromwellapp.fredhutch.org](https://cromwellapp.fredhutch.org/).  After you click the "Connect to Server" button, you'll put `http://gizmok30:20201` (or whatever your url is) where it says "My Own Cromwell".
 
 7.  While your server will normally stop after 7 days (the default), at which point if you have jobs still running you can simply restart your server and it will reconnect to existing jobs/workflows.  However, if you need to take down your server for whatever reason before that point, you can go to `rhino` and do:
 
