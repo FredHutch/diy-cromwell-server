@@ -1,34 +1,28 @@
 # diy-cromwell-server
-A repo containing instructions for running a Cromwell server on `gizmo` at the Fred Hutch.  These instructions were created and tested by Amy Paguirigan, so drop her a line if they don't work for you or you need help (Fred Hutch username is `apaguiri`) or you can tag @vortexing in Issues filed here in the GitHub repository.  Note if you file an issue, please be sure that you do not post sensitive information in your troubleshooting information like passwords and such, but the more info you can provide about errors, the better.  Alternatively, join the discussion in the Fred Hutch Data Community Slack in the [#workflow-managers](https://fhdata.slack.com/archives/CJFP1NYSZ) channel using your Fred Hutch, UW, SCHARP or Sagebase email.    Also you may want to check out our [example workflow repo for basic, testing workflows](https://github.com/FredHutch/wdl-test-workflows).
+A repo containing instructions for running a DIY Cromwell server on an on-prem SLURM cluster at the Fred Hutch.  These instructions were generated for an institution-specific configuration of Cromwell, but could serve as a starting point for other institutions customizing a configuration specific to their HPC infrastructure.  
 
 
 ## Cromwell Resources
-Cromwell is a workflow manager developed by the Broad which manages the individual tasks involved in multi-step workflows, tracks job metadata, provides an API/Swagger UI interface and allows users to manage multiple workflows simultaneously.  Cromwell currently runs workflows written in WDL workflow language.  [Learn more on the Fred Hutch wiki about using Cromwell at Fred Hutch.](https://sciwiki.fredhutch.org/compdemos/Cromwell/)  The WDL specification and documentation is curated by the [openWDL group](https://openwdl.org/).
+Cromwell is a workflow manager developed by the Broad which manages the individual tasks involved in multi-step workflows, tracks job metadata, provides an API/Swagger UI interface and allows users to manage multiple workflows simultaneously.  Cromwell currently runs workflows written in WDL workflow language.  The WDL specification and documentation is curated by the [openWDL group](https://openwdl.org/).
 
-You can see what is currently available publicly in the FredHutch GitHub institution by using [this link to search results](https://github.com/FredHutch?utf8=%E2%9C%93&q=wdl+OR+cromwell&type=&language=).
 
-Amy also made a shiny app you can use to monitor your own Cromwell server workflows when you have a Cromwell server running on `gizmo` that can be found [here](https://cromwellapp.fredhutch.org/).
-
-Amy has a basic R package that wraps the Cromwell API allowing you to submit, monitor and kill workflow jobs on `gizmo` from R directly. The package is [rcromwell](https://github.com/getwilds/rcromwell).
+The Fred Hutch Data Science Lab has developed an R Shiny app you can use to monitor your own Cromwell server workflows when you have a Cromwell server if you have users that would benefit from a simple UI.  That repo is here: [shiny-cromwell](https://github.com/FredHutch/shiny-cromwell).  There is also basic R package that wraps the Cromwell API allowing you to submit, monitor and kill workflow jobs to a Cromwell server from R directly. The package is [rcromwell](https://github.com/getwilds/rcromwell).
 
 
 ## Steps to prepare
-If you have questions about these steps, feel free to contact Amy Paguirigan (`apaguiri`) or `scicomp`.  
+If you have questions about these steps, please file an issue!   For Fred Hutch users, SciComp and the Data Science Lab have developed a new approach to using Cromwell on Fred Hutch infrastructure that is even simpler than the legacy approach documented here.  
+
+> Note: This information, while specific to Fred Hutch, is considered the "legacy" way to do this, but we're leaving it here in case this is useful for folks at other institutions in setting up their own configuration. Please see the new Fred Hutch approach called "PROOF" on the [Fred Hutch Biomedical Data Science Wiki data science section](https://sciwiki.fredhutch.org/datascience/ds_index/).  
 
 ### Rhino Access (one time)
-Currently, to run your own Cromwell server you'll need to know how to connect to `rhino` at the Fred Hutch. If you have never used the local cluster (`rhino`/`gizmo`), you may need to file a ticket by emailing fredhutch email `scicomp` and requesting your account be set up.  To do this you'll need to specify which PI you are sponsored by/work for.  You also may want to read a bit more about the use of our cluster over at [SciWiki](https://sciwiki.fredhutch.org/) in the Scientific Computing section about Access Methods, and Technologies.  
-
-### AWS S3 Access (optional as of version 1.3)
-Regardless of whether you are wanting to operate on data storaed in AWS S3  Refer to [SciWiki](https://sciwiki.fredhutch.org/scicomputing/compute_cloud/#get-aws-credentials) or email `scicomp` to request credentials. 
-
-As of version 1.3 if you have credentials, then the Cromwell server will be configured to allow input files to directly specified using their AWS S3 url.  However if you do not have AWS credentials, then the server will now successfully start up, simply without the ability to localize files from S3, thus all test workflows that use files in S3 will not work for you, but everything else should.
+Currently, to run your own Cromwell server you'll need to know how to connect to `rhino` at the Fred Hutch which are the login nodes to the 'gizmo' cluster.  
 
 ### Database Setup (one time)
 These instructions let you stand up a Cromwell server for 7 days at a time.  If you have workflows that run longer than that or you want to be able to get metadata for or restart jobs even after the server goes down, you'll want an external database to keep track of your progress even if your server goes down (for whatever reason). It also will allow your future workflows to use cached copies of data when the exact task has already been done (and recorded in the database).  We have found as well that by using a MySQL database for your Cromwell server, it will run faster and be better able to handle simultaneous workflows while also making all the metadata available to you during and after the run.  
 
 We currently suggest you go to [DB4Sci](https://mydb.fredhutch.org/login) and see the Wiki entry for DB4Sci [here](https://sciwiki.fredhutch.org/scicomputing/store_databases/#db4sci--previously-mydb).  There, you will login using Fred Hutch credentials, choose `Create DB Container`, and choose the MariaDB option.  The default database container values are typically fine, EXCEPT you likely need either weekly or no backups (no backups preferred) for this database. Save the `DB/Container Name`, `DB Username` and `DB Password` as you will need them for the  configuration step.  Once you click submit, a confirmation screen will appear (hopefully), and you'll need to note which `Port` is specified.  This is a 5 digit number currently.
 
-Once this is complete, you can file a ticket to `scicomp` to request the database to be set up in that container.  In the future it might be possible to have this step be part of the DB4Sci setup process but until then, you'll need to do this additional step. Or if you are able to get onto `rhino`, you can do the following to do this process yourself:
+ Or if you are able to get onto `rhino`, you can do the following to do this process yourself:
 
 ```
 ml MariaDB/10.5.1-foss-2019b
@@ -93,7 +87,7 @@ Go have fun now.
 > NOTE:  Please write down the url it specifies here.  This is the only place where you will be able to find the particular url for this instance of your Cromwell server, and you'll need that to be able to send jobs to the Crowmell server.  If you forget it, `scancel` the Cromwell server job and start a new one.
 
 
-6. This url is what you use to submit and monitor workflows with the Shiny app at [cromwellapp.fredhutch.org](https://cromwellapp.fredhutch.org/).  After you click the "Connect to Server" button, you'll put `http://gizmok30:20201` (or whatever your url is) where it says "My Own Cromwell".
+6. This url is what you use to submit and monitor workflows with the Shiny app mentioned above.    After you click the "Connect to Server" button, you'll put `http://gizmok30:20201` (or whatever your url is) where it says "My Own Cromwell".
 
 7.  While your server will normally stop after 7 days (the default), at which point if you have jobs still running you can simply restart your server and it will reconnect to existing jobs/workflows.  However, if you need to take down your server for whatever reason before that point, you can go to `rhino` and do:
 
@@ -109,7 +103,6 @@ scancel 50062886
 
 ```
 
-8.  See our [Test Workflow repo](https://github.com/FredHutch/wdl-test-workflows) once your server is up and run through the tests specified in the markdowns there. 
 > NOTE: For those test workflows that use Docker containers, know that the first time you run them, you may notice that jobs aren't being sent very quickly.  That is because for our cluster, we need to convert those Docker containers to something that can be run by Singularity.  The first time a Docker container is used, it must be converted, but in the future Cromwell will used the cached version of the Docker container and jobs will be submitted more quickly. 
 
 
